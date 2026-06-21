@@ -1,0 +1,423 @@
+{% load shop_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — khikmatillaev's</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --crimson:#AE1F23;--deep:#780000;--gold:#c9a96e;--gold-light:#e8d5b0;
+  --cream:#f9f5ee;--text:#1a0a0a;--muted:#7a5c5c;--border:rgba(174,31,35,0.15);
+  --surface:#fff9f5;
+}
+body{background:var(--cream);color:var(--text);font-family:'Jost',sans-serif;min-height:100vh;}
+
+/* HEADER */
+.admin-header{
+  background:var(--deep);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;color:var(--gold);}
+.admin-label{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-left:8px;}
+.header-right{display:flex;gap:8px;align-items:center;}
+.btn-link{
+  background:rgba(255,255,255,0.12);border:1px solid rgba(201,169,110,.3);
+  color:var(--gold-light);padding:7px 13px;font-family:'Jost',sans-serif;
+  font-size:.7rem;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;
+  text-decoration:none;transition:all .2s;
+}
+.btn-link:hover{background:rgba(255,255,255,0.22);color:var(--gold);}
+.btn-danger-sm{
+  background:rgba(174,31,35,.15);border:1px solid rgba(174,31,35,.3);
+  color:#ffaaaa;padding:7px 13px;font-family:'Jost',sans-serif;
+  font-size:.7rem;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;
+}
+.btn-danger-sm:hover{background:rgba(174,31,35,.35);}
+
+/* BODY */
+.admin-body{padding:20px 16px;max-width:1100px;margin:0 auto;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:28px;}
+.stat{background:#fff;border:1px solid var(--border);padding:14px 16px;}
+.stat-label{font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--deep);font-weight:600;}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--deep);font-style:italic;}
+.btn-primary{
+  background:var(--deep);color:#fff;border:none;padding:10px 18px;
+  font-family:'Jost',sans-serif;font-size:.72rem;font-weight:500;
+  letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:background .2s;
+}
+.btn-primary:hover{background:var(--crimson);}
+.btn-secondary{
+  background:#f5f5f5;color:var(--text);border:1px solid var(--border);padding:8px 14px;
+  font-family:'Jost',sans-serif;font-size:.72rem;cursor:pointer;transition:all .2s;
+}
+.btn-secondary:hover{background:#eee;}
+
+/* FORM */
+.product-form{background:#fff;border:1px solid var(--border);padding:20px;margin-bottom:20px;display:none;}
+.product-form.open{display:block;}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--deep);font-style:italic;margin-bottom:16px;}
+.form-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.form-field{display:flex;flex-direction:column;gap:4px;}
+.form-field.full{grid-column:1/-1;}
+.form-field label{font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.form-field input,.form-field select,.form-field textarea{
+  border:1px solid var(--border);padding:9px 11px;font-family:'Jost',sans-serif;
+  font-size:.87rem;outline:none;transition:border-color .2s;background:#fff;
+  resize:vertical;-webkit-appearance:none;border-radius:0;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--crimson);}
+.hint{font-size:.62rem;color:var(--muted);line-height:1.4;margin-top:2px;}
+.sizes-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
+.size-check{display:flex;align-items:center;gap:5px;cursor:pointer;}
+.size-check input{width:16px;height:16px;accent-color:var(--crimson);cursor:pointer;}
+.size-check span{font-size:.82rem;font-weight:500;}
+.form-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.img-preview{
+  width:52px;height:52px;background:#f0e8e0;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  overflow:hidden;flex-shrink:0;
+}
+.img-preview img{width:100%;height:100%;object-fit:cover;}
+.img-row{display:flex;gap:10px;align-items:flex-start;}
+.img-row .form-field{flex:1;margin:0;}
+
+/* TABLE */
+.table-wrap{background:#fff;border:1px solid var(--border);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:500px;}
+th{
+  text-align:left;padding:10px 12px;font-size:.58rem;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);
+  background:#faf5f0;font-weight:500;white-space:nowrap;
+}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:.84rem;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fdf9f5;}
+.thumb{
+  width:38px;height:38px;background:#f0e8e0;display:flex;align-items:center;
+  justify-content:center;font-size:1.1rem;overflow:hidden;flex-shrink:0;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+.prod-name{font-weight:500;white-space:nowrap;}
+.prod-cat{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.prod-price{font-family:'Cormorant Garamond',serif;font-size:.97rem;color:var(--deep);font-weight:600;white-space:nowrap;}
+.badge-tag{font-size:.56rem;padding:3px 8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.badge-new{background:var(--crimson);color:#fff;}
+.badge-hot{background:var(--deep);color:#fff;}
+.badge-none{color:var(--muted);}
+.sizes-list{font-size:.68rem;color:var(--muted);max-width:100px;}
+.tbl-actions{display:flex;gap:5px;flex-wrap:wrap;}
+.btn-edit{
+  background:#f5f5f5;color:var(--text);border:1px solid var(--border);padding:5px 10px;
+  font-family:'Jost',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-edit:hover{background:#eee;}
+.btn-del{
+  background:#fff0f0;color:#c00;border:1px solid #ffd0d0;padding:5px 10px;
+  font-family:'Jost',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-del:hover{background:#ffebeb;}
+.in-stock-badge{font-size:.62rem;padding:2px 7px;border-radius:20px;}
+.in-stock-yes{background:#e6f4ea;color:#2e7d32;}
+.in-stock-no{background:#fff0f0;color:#c00;}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:.9rem;}
+
+/* MODAL (edit) */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(60,0,0,.5);z-index:200;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+.modal-backdrop.open{display:flex;}
+.modal-box{background:#fff;width:100%;max-width:560px;padding:24px;margin:auto;position:relative;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-close-btn{
+  position:absolute;top:12px;right:12px;background:none;border:none;
+  font-size:1.2rem;cursor:pointer;color:var(--muted);
+}
+
+@media(min-width:600px){
+  .admin-body{padding:28px 32px;}
+  .stats{grid-template-columns:repeat(4,1fr);}
+  .form-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="admin-header">
+  <div style="display:flex;align-items:center;">
+    <span class="logo">khikmatillaev's</span>
+    <span class="admin-label">/ Товары</span>
+  </div>
+  <div class="header-right">
+    <a class="btn-link" href="/">← Сайт</a>
+    <a class="btn-danger-sm" href="/admin/logout">Выйти</a>
+  </div>
+</div>
+
+<div class="admin-body">
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Всего товаров</div><div class="stat-value">{{ stats.total }}</div></div>
+    <div class="stat"><div class="stat-label">Категорий</div><div class="stat-value">{{ stats.cats }}</div></div>
+    <div class="stat"><div class="stat-label">Новинок</div><div class="stat-value">{{ stats.new }}</div></div>
+    <div class="stat"><div class="stat-label">Хитов</div><div class="stat-value">{{ stats.hot }}</div></div>
+  </div>
+
+  <!-- ADD FORM -->
+  <div class="section-header">
+    <span class="section-title">Каталог</span>
+    <button class="btn-primary" onclick="toggleForm()">+ Добавить товар</button>
+  </div>
+
+  <div class="product-form" id="add-form">
+    <div class="form-title">Новый товар</div>
+    <form method="post" action="/admin/products/add">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Название *</label>
+          <input type="text" name="name" placeholder="Название товара" required>
+        </div>
+        <div class="form-field">
+          <label>Категория *</label>
+          <input type="text" name="category" placeholder="Например: Базовые" required
+            list="cat-opts">
+          <datalist id="cat-opts">
+            {% for p in products %}<option value="{{ p.category }}">{% endfor %}
+          </datalist>
+        </div>
+        <div class="form-field">
+          <label>Цена (сум) *</label>
+          <input type="number" name="price" placeholder="290000" required min="0">
+        </div>
+        <div class="form-field">
+          <label>Значок</label>
+          <select name="badge">
+            <option value="">— Нет —</option>
+            <option value="new">Новинка</option>
+            <option value="hot">🔥 Хит</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label>Описание *</label>
+          <textarea name="description" rows="2" placeholder="Краткое описание..." required></textarea>
+        </div>
+        <div class="form-field full">
+          <label>Фото (через запятую)</label>
+          <div class="img-row">
+            <div class="img-preview" id="add-preview">👕</div>
+            <div class="form-field" style="gap:6px">
+              <input type="text" name="images_raw" id="add-img-input" placeholder="👕  или  https://…/1.jpg, https://…/2.jpg" oninput="previewImg(this,'add-preview')">
+              <span class="hint">Первое фото — обложка. Для галереи разделяйте запятой.</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Размеры в наличии</label>
+          <div class="sizes-grid">
+            {% for size in sizes_all %}
+            <label class="size-check">
+              <input type="checkbox" name="sizes" value="{{ size }}" checked>
+              <span>{{ size }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" name="in_stock" value="on" checked style="width:16px;height:16px;accent-color:var(--crimson);">
+            В наличии
+          </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Сохранить</button>
+        <button type="button" class="btn-secondary" onclick="toggleForm()">Отмена</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- PRODUCT TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Фото</th>
+          <th>Товар</th>
+          <th>Цена</th>
+          <th>Размеры</th>
+          <th>Метка</th>
+          <th>Статус</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if products %}
+          {% for p in products %}
+          <tr>
+            <td>
+              <div class="thumb">
+                {% with first_img=p.images|first %}
+                  {% if first_img|is_url %}
+                    <img src="{{ first_img }}" alt="">
+                  {% else %}
+                    {{ first_img }}
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </td>
+            <td>
+              <div class="prod-name">{{ p.name }}</div>
+              <div class="prod-cat">{{ p.category }}</div>
+            </td>
+            <td><div class="prod-price">{{ p.price|format_price }}</div></td>
+            <td><div class="sizes-list">{{ p.sizes|join:", " }}</div></td>
+            <td>
+              {% if p.badge == 'new' %}<span class="badge-tag badge-new">Новинка</span>
+              {% elif p.badge == 'hot' %}<span class="badge-tag badge-hot">🔥 Хит</span>
+              {% else %}<span class="badge-tag badge-none">—</span>{% endif %}
+            </td>
+            <td>
+              {% if p.in_stock %}<span class="in-stock-badge in-stock-yes">В наличии</span>
+              {% else %}<span class="in-stock-badge in-stock-no">Нет</span>{% endif %}
+            </td>
+            <td>
+              <div class="tbl-actions">
+                <button class="btn-edit" onclick="openEdit({{ p.id }})">✏ Изменить</button>
+                <form method="post" action="/admin/products/{{ p.id }}/delete" onsubmit="return confirm('Удалить «{{ p.name }}»?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-del">✕ Удалить</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" class="empty">Нет товаров. Добавьте первый.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-backdrop" id="edit-modal" onclick="if(event.target===this)closeEdit()">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeEdit()">✕</button>
+    <div class="form-title">Редактировать товар</div>
+    <form method="post" id="edit-form">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Название *</label>
+          <input type="text" name="name" id="e-name" required>
+        </div>
+        <div class="form-field">
+          <label>Категория *</label>
+          <input type="text" name="category" id="e-cat" required list="cat-opts">
+        </div>
+        <div class="form-field">
+          <label>Цена (сум) *</label>
+          <input type="number" name="price" id="e-price" required min="0">
+        </div>
+        <div class="form-field">
+          <label>Значок</label>
+          <select name="badge" id="e-badge">
+            <option value="">— Нет —</option>
+            <option value="new">Новинка</option>
+            <option value="hot">🔥 Хит</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label>Описание *</label>
+          <textarea name="description" id="e-desc" rows="2" required></textarea>
+        </div>
+        <div class="form-field full">
+          <label>Фото (через запятую)</label>
+          <div class="img-row">
+            <div class="img-preview" id="edit-preview">👕</div>
+            <div class="form-field" style="gap:6px">
+              <input type="text" name="images_raw" id="e-img" placeholder="👕  или  https://…/1.jpg" oninput="previewImg(this,'edit-preview')">
+            </div>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Размеры в наличии</label>
+          <div class="sizes-grid" id="e-sizes-grid">
+            {% for size in sizes_all %}
+            <label class="size-check">
+              <input type="checkbox" class="e-size-cb" name="sizes" value="{{ size }}">
+              <span>{{ size }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" name="in_stock" id="e-stock" value="on" style="width:16px;height:16px;accent-color:var(--crimson);">
+            В наличии
+          </label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Сохранить изменения</button>
+        <button type="button" class="btn-secondary" onclick="closeEdit()">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Сериализованные данные продуктов для JS
+const PRODUCTS_DATA = JSON.parse('{{ products_json|safe }}');
+
+function toggleForm(){
+  const f=document.getElementById('add-form');
+  f.classList.toggle('open');
+  if(f.classList.contains('open')) f.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function previewImg(input, previewId){
+  const first=(input.value||'').split(',')[0].trim();
+  const el=document.getElementById(previewId);
+  if(!first){el.innerHTML='👕';return;}
+  if(first.startsWith('http')||first.startsWith('/'))
+    el.innerHTML=`<img src="${first}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='❌'">`;
+  else el.innerHTML=first;
+}
+
+function openEdit(id){
+  const p = PRODUCTS_DATA.find(item => item.id === id);
+  if (!p) return;
+
+  document.getElementById('edit-form').action='/admin/products/'+p.id+'/edit';
+  document.getElementById('e-name').value=p.name;
+  document.getElementById('e-cat').value=p.category;
+  document.getElementById('e-price').value=p.price;
+  document.getElementById('e-badge').value=p.badge||'';
+  document.getElementById('e-desc').value=p.description||'';
+  const imgs=Array.isArray(p.images)?p.images:['👕'];
+  document.getElementById('e-img').value=imgs.join(', ');
+  previewImg(document.getElementById('e-img'),'edit-preview');
+  document.querySelectorAll('.e-size-cb').forEach(cb=>{
+    cb.checked=Array.isArray(p.sizes)&&p.sizes.includes(cb.value);
+  });
+  document.getElementById('e-stock').checked=p.in_stock;
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeEdit(){
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+</script>
+</body>
+</html>

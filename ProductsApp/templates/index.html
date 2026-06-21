@@ -1,0 +1,987 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>khikmatillaev's</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --crimson: #AE1F23;
+  --deep: #780000;
+  --gold: #c9a96e;
+  --gold-light: #e8d5b0;
+  --cream: #f9f5ee;
+  --text: #1a0a0a;
+  --muted: #7a5c5c;
+  --border: rgba(174,31,35,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+
+body {
+  background:var(--cream);
+  color:var(--text);
+  font-family:'Jost',sans-serif;
+  min-height:100%;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ── BACKGROUND VIDEO ── */
+#bg-video-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(160deg, #3d0000 0%, #780000 50%, #1a0000 100%);
+}
+#bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  transform: translateZ(0);
+  will-change: opacity;
+}
+#bg-video.loaded { opacity: 0.6; }
+#bg-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,0,0,0.55);
+}
+
+@media (max-width: 599px) {
+  #bg-video { display: none; }
+}
+
+header, .hero, .controls, .grid, footer, .modal-overlay, #splash {
+  position: relative;
+  z-index: 1;
+}
+
+/* SPLASH */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--deep);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  transition: opacity .8s ease, visibility .8s;
+}
+#splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-brand {
+  font-family:'Cormorant Garamond',serif;
+  font-size: clamp(2rem,8vw,3.2rem);
+  font-style: italic;
+  color: var(--gold);
+  letter-spacing: 2px;
+  font-weight: 400;
+  animation: fadeUp .9s ease both;
+}
+.splash-line { width:0; height:1px; background:var(--gold); margin:20px auto 0; animation:lineGrow 1s .5s ease forwards; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes lineGrow { to{width:120px} }
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(80,0,0,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(201,169,110,.2);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size: 1.6rem; font-style: italic;
+  color: var(--gold); text-decoration: none;
+  font-weight: 400; letter-spacing: 1px;
+}
+
+/* HAMBURGER */
+.menu-btn-wrap {
+  position: fixed;
+  top: 11px;
+  left: 16px;
+  z-index: 200;
+}
+.menu-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(201,169,110,.35);
+  background: rgba(80,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background .2s, border-color .2s;
+  position: relative;
+}
+.menu-btn:hover { background: var(--deep); border-color: var(--gold); }
+.menu-btn span {
+  width: 100%;
+  height: 2px;
+  background: var(--gold);
+  display: block;
+  transition: transform .3s, opacity .3s;
+}
+.menu-badge {
+  position: absolute;
+  top: -5px; right: -5px;
+  background: var(--crimson);
+  color: #fff;
+  font-size: .5rem;
+  font-weight: 600;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jost', sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+
+.sidebar {
+  position: fixed; top: 0; left: -320px;
+  width: 300px; max-width: 85vw; height: 100vh;
+  background: #180000; z-index: 999;
+  transition: left .3s ease;
+  overflow-y: auto;
+  border-right: 1px solid rgba(201,169,110,.2);
+  display: flex; flex-direction: column;
+}
+.sidebar.open { left: 0; }
+
+.sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 18px;
+  border-bottom: 1px solid rgba(201,169,110,.15);
+  flex-shrink: 0;
+}
+.sidebar-header h3 {
+  color: var(--gold); font-family:'Cormorant Garamond',serif;
+  font-size: 1.5rem; font-weight: 500; font-style: italic;
+}
+.sidebar-close {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(201,169,110,.25);
+  color: rgba(232,213,176,.8);
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.sidebar-close:hover { background: rgba(174,31,35,.5); color: #fff; }
+
+.sidebar-section {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(201,169,110,.08);
+}
+.sidebar-title {
+  color: var(--gold); font-size: .6rem; letter-spacing: 2.5px;
+  text-transform: uppercase; margin-bottom: 12px; font-weight: 500;
+}
+.sidebar .filter-btns-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.sidebar .filter-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(201,169,110,0.25);
+  padding: 7px 12px;
+  color: rgba(232,213,176,0.75);
+  font-family:'Jost',sans-serif; font-size: .66rem; font-weight: 500;
+  letter-spacing: .8px; text-transform: uppercase;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.sidebar .filter-btn:hover { background: rgba(174,31,35,.35); color: #fff; border-color: var(--crimson); }
+.sidebar .filter-btn.active { background: var(--crimson); color: #fff; border-color: var(--crimson); }
+.sidebar .filter-btn.size-active { background: var(--deep); color: #fff; border-color: var(--deep); }
+
+/* PRICE */
+.price-inputs { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.price-sep { color: rgba(201,169,110,.5); font-size: .8rem; flex-shrink: 0; }
+.price-inputs input {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(201,169,110,.25);
+  color: #fff; padding: 9px 10px;
+  font-family:'Jost',sans-serif; font-size: .8rem;
+  outline: none; transition: border-color .2s;
+  -webkit-appearance: none; border-radius: 0;
+}
+.price-inputs input:focus { border-color: var(--gold); background: rgba(255,255,255,.12); }
+.price-inputs input::placeholder { color: rgba(232,213,176,.35); }
+.apply-price {
+  width: 100%; background: var(--deep); border: none;
+  color: #fff; padding: 11px;
+  font-family:'Jost',sans-serif; font-size: .68rem; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background .2s;
+}
+.apply-price:hover { background: var(--crimson); }
+.reset-filters {
+  margin: 0 20px 20px; width: calc(100% - 40px);
+  background: transparent; border: 1px solid rgba(174,31,35,.4);
+  color: rgba(232,213,176,.6); padding: 10px;
+  font-family:'Jost',sans-serif; font-size: .64rem; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all .2s;
+}
+.reset-filters:hover { background: rgba(174,31,35,.2); color: #fff; border-color: var(--crimson); }
+
+/* HERO */
+.hero {
+  padding: 60px 20px 48px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23c9a96e' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size: clamp(2.4rem,10vw,6.5rem);
+  font-style: italic; color: #fff;
+  font-weight: 400; letter-spacing: 2px;
+  line-height: 1; position: relative;
+  text-shadow: 0 2px 32px rgba(0,0,0,.6);
+}
+.hero-title span { color: var(--gold); }
+.hero-sub {
+  font-size: .72rem; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--gold-light);
+  margin-top: 14px; font-weight: 300; position: relative;
+}
+
+/* CONTROLS — search + sort */
+.controls {
+  padding: 14px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(15,0,0,0.32);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(201,169,110,0.18);
+  flex-wrap: wrap;
+}
+.search-wrap { position: relative; flex: 1; min-width: 130px; }
+.search-input {
+  width: 100%;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(201,169,110,0.35);
+  padding: 9px 12px 9px 36px;
+  color: #fff; font-family:'Jost',sans-serif; font-size: .86rem;
+  outline: none; transition: border-color .2s; border-radius: 0;
+  -webkit-appearance: none;
+}
+.search-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.18); }
+.search-input::placeholder { color: rgba(232,213,176,0.55); }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:rgba(201,169,110,0.65); pointer-events:none; }
+
+/* SORT DROPDOWN */
+.sort-wrap { min-width: 130px; }
+.sort-select {
+  width: 100%;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(201,169,110,0.35);
+  padding: 9px 12px;
+  color: var(--gold-light);
+  font-family:'Jost',sans-serif; font-size: .78rem;
+  outline: none; transition: border-color .2s;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+.sort-select:focus { border-color: var(--gold); }
+.sort-select option { background: #180000; color: var(--gold-light); }
+
+/* Active filters chips */
+.active-filters-strip {
+  display: none;
+  padding: 8px 16px;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: rgba(10,0,0,.25);
+  border-bottom: 1px solid rgba(201,169,110,.1);
+  position: relative;
+  z-index: 1;
+}
+.active-filters-strip.visible { display: flex; }
+.filter-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(174,31,35,.25);
+  border: 1px solid rgba(174,31,35,.45);
+  color: rgba(232,213,176,.9);
+  font-size: .58rem;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.filter-chip:hover { background: rgba(174,31,35,.5); }
+.filter-chip .chip-x { font-size: .7rem; line-height: 1; }
+
+/* GRID */
+.grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.no-results {
+  grid-column: 1/-1; text-align: center;
+  padding: 60px 20px; color: rgba(232,213,176,0.6);
+  font-size: .9rem;
+}
+.loading-msg {
+  grid-column: 1/-1; text-align: center;
+  padding: 60px 20px; color: rgba(232,213,176,0.5);
+  font-size: .8rem; letter-spacing: 2px; text-transform: uppercase;
+}
+
+.card { cursor: pointer; animation: fadeUp .45s ease both; }
+.card-img {
+  width: 100%; aspect-ratio: 3/4;
+  background: linear-gradient(135deg,#f0e8e0,#e8d5c8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative; overflow: hidden;
+}
+.card-img img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.card-img .ep { font-size: 3.5rem; }
+.badge {
+  position: absolute; top: 0; left: 0; z-index: 2;
+  background: var(--crimson); color: #fff;
+  font-size: .52rem; font-weight: 600; padding: 4px 9px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.badge.hot { background: var(--deep); }
+.img-dots { position:absolute; bottom:7px; left:50%; transform:translateX(-50%); display:flex; gap:4px; z-index:2; }
+.img-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.45); transition:background .3s; }
+.img-dot.active { background:#fff; }
+
+.card-body {
+  padding: 9px 0 0;
+  background: rgba(255,249,245,0.95);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.card-cat { font-size:.58rem; color:var(--crimson); letter-spacing:2px; text-transform:uppercase; margin-bottom:2px; font-weight:500; padding:0 2px; }
+.card-name { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:500; margin-bottom:3px; line-height:1.3; padding:0 2px; }
+.card-desc { font-size:.7rem; color:var(--muted); margin-bottom:7px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; padding:0 2px; }
+.card-footer { display:flex; align-items:center; justify-content:space-between; gap:5px; padding:0 2px 2px; }
+.card-price { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--deep); white-space:nowrap; }
+.card-price span { font-family:'Jost',sans-serif; font-size:.6rem; color:var(--muted); font-weight:400; }
+.order-btn {
+  background: var(--deep); color: #fff; border: none; padding: 6px 10px;
+  font-family:'Jost',sans-serif; font-size:.6rem; font-weight:500;
+  letter-spacing:.7px; text-transform:uppercase; cursor:pointer; transition:background .2s; white-space:nowrap;
+}
+.order-btn:hover, .order-btn:active { background: var(--crimson); }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(40,0,0,.65);
+  z-index: 300; align-items: flex-end; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #fff; width: 100%; max-width: 600px;
+  max-height: 92vh; overflow-y: auto;
+  animation: slideUp .3s ease; position: relative;
+}
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modal-gallery {
+  position: relative; width: 100%; aspect-ratio: 1/1;
+  background: #f0e8e0; overflow: hidden; touch-action: pan-y;
+}
+.gallery-track { display: flex; height: 100%; transition: transform .35s ease; will-change: transform; }
+.gallery-slide {
+  min-width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6rem; flex-shrink: 0;
+}
+.gallery-slide img { width: 100%; height: 100%; object-fit: cover; }
+.g-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,.35); border: none; color: #fff;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 3; font-size: 1.1rem; transition: background .2s;
+}
+.g-arrow:hover { background: rgba(0,0,0,.6); }
+.g-arrow.prev { left: 8px; }
+.g-arrow.next { right: 8px; }
+.g-dots { position:absolute; bottom:9px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:3; }
+.g-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.45); cursor:pointer; transition:background .3s; }
+.g-dot.active { background:#fff; }
+
+.modal-body { padding: 18px 18px 28px; }
+.modal-cat { font-size:.6rem; color:var(--crimson); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:500; }
+.modal-name { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:500; margin-bottom:7px; line-height:1.2; }
+.modal-desc { color:var(--muted); font-size:.82rem; line-height:1.6; margin-bottom:16px; }
+.modal-sizes label { display:block; font-size:.58rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; font-weight:500; }
+.size-btns { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.size-btn {
+  border: 1px solid var(--border); padding: 8px 12px; background: #fff;
+  font-family:'Jost',sans-serif; font-size:.8rem; font-weight:500;
+  cursor: pointer; transition: all .2s; min-width: 44px; text-align:center;
+}
+.size-btn:hover { border-color:var(--crimson); color:var(--crimson); }
+.size-btn.selected { background: var(--deep); color: #fff; border-color: var(--deep); }
+.modal-footer { display:flex; align-items:center; gap:12px; }
+.modal-price { font-family:'Cormorant Garamond',serif; font-size:1.45rem; font-weight:600; color:var(--deep); white-space:nowrap; }
+.modal-order-btn {
+  flex: 1; background: var(--deep); color: #fff; border: none; padding: 13px 10px;
+  font-family:'Jost',sans-serif; font-size:.74rem; font-weight:500;
+  letter-spacing:1.1px; text-transform:uppercase; cursor:pointer; transition:background .2s;
+}
+.modal-order-btn:hover { background: var(--crimson); }
+.modal-close {
+  position:absolute; top:10px; right:10px;
+  background: rgba(0,0,0,.4); border: none; color: #fff;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .88rem; z-index: 5;
+}
+.modal-close:hover { background: rgba(0,0,0,.65); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid rgba(201,169,110,0.2);
+  padding: 36px 20px 28px; text-align: center;
+  background: rgba(10,0,0,0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+footer a { color:var(--gold-light); text-decoration:none; transition:color .2s; }
+footer a:hover { color:var(--gold); }
+.footer-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-style:italic; color:var(--gold); letter-spacing:1px; margin-bottom:5px; }
+.footer-sub { font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:rgba(232,213,176,0.4); margin-bottom:24px; font-weight:300; }
+.footer-contacts { display:flex; flex-direction:column; gap:14px; align-items:center; margin-bottom:24px; }
+.footer-contact-item { display:flex; align-items:center; gap:10px; color:rgba(232,213,176,0.82); font-size:.8rem; text-decoration:none; transition:color .2s; }
+.footer-contact-item:hover { color:var(--gold); }
+.footer-contact-icon { width:34px; height:34px; border-radius:50%; border:1px solid rgba(201,169,110,0.32); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:border-color .2s,background .2s; }
+.footer-contact-item:hover .footer-contact-icon { border-color:var(--gold); background:rgba(201,169,110,0.1); }
+.footer-contact-icon svg { width:15px; height:15px; fill:currentColor; }
+.footer-divider { width:44px; height:1px; background:rgba(201,169,110,0.22); margin:0 auto 18px; }
+.footer-copy { font-size:.62rem; letter-spacing:1px; color:rgba(201,169,110,0.32); }
+
+/* ── DESKTOP ── */
+@media(min-width:600px) {
+  header { padding:16px 48px; }
+  .controls { padding:18px 48px; }
+  .hero { padding:80px 24px 64px; }
+  .grid { padding:32px 48px; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:26px; }
+  .card-img .ep { font-size:5rem; }
+  .modal-overlay { align-items:center; padding:24px; }
+  .modal-gallery { aspect-ratio:4/3; }
+  .modal-name { font-size:2rem; }
+  .modal-body { padding:24px 28px 32px; }
+  footer { padding:48px 48px 32px; }
+  .footer-contacts { flex-direction:row; justify-content:center; gap:28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background video -->
+<div id="bg-video-wrap">
+  <video
+    id="bg-video"
+    autoplay muted loop playsinline preload="metadata"
+    oncanplay="this.classList.add('loaded')"
+  >
+    <source src="/static/background.mp4" type="video/mp4">
+  </video>
+  <div id="bg-video-overlay"></div>
+</div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-brand">khikmatillaev's</div>
+  <div class="splash-line"></div>
+</div>
+
+<!-- HAMBURGER -->
+<div class="menu-btn-wrap">
+  <button class="menu-btn" onclick="toggleSidebar()" aria-label="Фильтры">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span class="menu-badge" id="menu-badge">0</span>
+  </button>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>Фильтры</h3>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">Категория</div>
+    <div class="filter-btns-wrap" id="sidebar-categories"></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">Размер</div>
+    <div class="filter-btns-wrap" id="sidebar-sizes"></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">Цена (сум)</div>
+    <div class="price-inputs">
+      <input type="number" id="min-price" placeholder="От" min="0">
+      <span class="price-sep">—</span>
+      <input type="number" id="max-price" placeholder="До" min="0">
+    </div>
+    <button class="apply-price" onclick="applyPrice()">Применить</button>
+  </div>
+  <button class="reset-filters" onclick="resetFilters()">Сбросить все фильтры</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">khikmatillaev's</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-title"><span>khikmatillaev's</span></div>
+  <div class="hero-sub">Эксклюзивная одежда · Ташкент</div>
+</section>
+
+<!-- CONTROLS: search + sort -->
+<div class="controls">
+  <div class="search-wrap">
+    <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="search" type="search" placeholder="Поиск..." oninput="renderProducts()">
+  </div>
+  <div class="sort-wrap">
+    <select class="sort-select" id="sort" onchange="renderProducts()">
+      <option value="default">По умолчанию</option>
+      <option value="price-asc">Сначала дешёвые</option>
+      <option value="price-desc">Сначала дорогие</option>
+      <option value="name">По названию</option>
+      <option value="newest">Новинки</option>
+    </select>
+  </div>
+</div>
+
+<!-- ACTIVE FILTERS CHIPS -->
+<div class="active-filters-strip" id="active-filters-strip"></div>
+
+<!-- PRODUCT GRID -->
+<div class="grid" id="grid">
+  <div class="loading-msg">Загрузка каталога…</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-title">khikmatillaev's</div>
+  <div class="footer-sub">Связаться с нами</div>
+  <div class="footer-contacts">
+    <a class="footer-contact-item" href="https://t.me/data_n0thing" target="_blank">
+      <div class="footer-contact-icon">
+        <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      </div>
+      Telegram · @data_n0thing
+    </a>
+    <a class="footer-contact-item" href="tel:+998901234567">
+      <div class="footer-contact-icon">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      </div>
+      +998 90 123 45 67
+    </a>
+    <a class="footer-contact-item" href="https://instagram.com/khikmatillaevs" target="_blank">
+      <div class="footer-contact-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </div>
+      @khikmatillaevs
+    </a>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-copy">© 2025 khikmatillaev's · Ташкент</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-gallery" id="modal-gallery">
+      <div class="gallery-track" id="gallery-track"></div>
+      <button class="g-arrow prev" id="g-prev" onclick="galleryNav(-1)">&#8249;</button>
+      <button class="g-arrow next" id="g-next" onclick="galleryNav(1)">&#8250;</button>
+      <div class="g-dots" id="g-dots"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat"  id="modal-cat"></div>
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-sizes">
+        <label>Выберите размер</label>
+        <div class="size-btns" id="size-btns"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-price" id="modal-price"></div>
+        <button class="modal-order-btn" id="modal-order-btn" onclick="orderProduct()">Заказать в Telegram</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TG = 'data_n0thing';
+let allProducts   = [];
+let activeCategory = 'Все';
+let activeSize     = '';
+let priceMin       = null;
+let priceMax       = null;
+let selectedSize   = '';
+let currentProduct = null;
+let gImgs = [], gIdx = 0;
+
+// ── SIDEBAR ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// ── FETCH ──
+async function loadData() {
+  try {
+    const [prodRes, catRes, sizeRes] = await Promise.all([
+      fetch('/api/products'),
+      fetch('/api/products/categories'),
+      fetch('/api/products/sizes'),
+    ]);
+    const prodData = await prodRes.json();
+    const catData  = await catRes.json();
+    const sizeData = await sizeRes.json();
+
+    // API возвращает массив напрямую, а не {products: […]}
+    allProducts = Array.isArray(prodData) ? prodData : (prodData.products || []);
+    buildCategoryFilters(['Все', ...(catData.categories || [])]);
+    buildSizeFilters(sizeData.sizes || []);
+    renderProducts();
+  } catch(e) {
+    console.error('Ошибка загрузки:', e);
+    document.getElementById('grid').innerHTML =
+      '<div class="no-results">Ошибка загрузки каталога. Проверьте соединение.</div>';
+  }
+}
+
+// ── BUILD FILTERS ──
+function buildCategoryFilters(cats) {
+  document.getElementById('sidebar-categories').innerHTML = cats.map(c =>
+    `<button class="filter-btn ${c === activeCategory ? 'active' : ''}"
+      onclick="setCategory('${c}')">${c}</button>`
+  ).join('');
+}
+
+function buildSizeFilters(sizes) {
+  document.getElementById('sidebar-sizes').innerHTML = sizes.map(s =>
+    `<button class="filter-btn ${s === activeSize ? 'size-active' : ''}"
+      onclick="setSize('${s}')">${s}</button>`
+  ).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll('#sidebar-categories .filter-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.trim() === cat)
+  );
+  renderProducts();
+  updateChips();
+  updateBadge();
+}
+
+function setSize(size) {
+  activeSize = (activeSize === size) ? '' : size;
+  document.querySelectorAll('#sidebar-sizes .filter-btn').forEach(b =>
+    b.classList.toggle('size-active', b.textContent.trim() === activeSize)
+  );
+  renderProducts();
+  updateChips();
+  updateBadge();
+}
+
+function applyPrice() {
+  const minVal = document.getElementById('min-price').value;
+  const maxVal = document.getElementById('max-price').value;
+  priceMin = minVal !== '' ? parseInt(minVal) : null;
+  priceMax = maxVal !== '' ? parseInt(maxVal) : null;
+  renderProducts();
+  updateChips();
+  updateBadge();
+  closeSidebar();
+}
+
+function resetFilters() {
+  activeCategory = 'Все';
+  activeSize = '';
+  priceMin = null;
+  priceMax = null;
+  document.getElementById('min-price').value = '';
+  document.getElementById('max-price').value = '';
+  document.getElementById('search').value = '';
+  document.getElementById('sort').value = 'default';
+
+  const cats = ['Все', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
+  buildCategoryFilters(cats);
+  const sizes = [...new Set(allProducts.flatMap(p => p.sizes || []))].sort();
+  buildSizeFilters(sizes);
+  renderProducts();
+  updateChips();
+  updateBadge();
+}
+
+// ── CHIPS ──
+function updateChips() {
+  const strip = document.getElementById('active-filters-strip');
+  const chips = [];
+  if (activeCategory !== 'Все') {
+    chips.push(`<div class="filter-chip" onclick="setCategory('Все')">
+      ${activeCategory} <span class="chip-x">×</span>
+    </div>`);
+  }
+  if (activeSize) {
+    chips.push(`<div class="filter-chip" onclick="setSize('${activeSize}')">
+      Размер: ${activeSize} <span class="chip-x">×</span>
+    </div>`);
+  }
+  if (priceMin !== null || priceMax !== null) {
+    const label = [
+      priceMin !== null ? `от ${priceMin.toLocaleString('ru')}` : '',
+      priceMax !== null ? `до ${priceMax.toLocaleString('ru')}` : ''
+    ].filter(Boolean).join(' ');
+    chips.push(`<div class="filter-chip" onclick="clearPrice()">
+      ${label} сум <span class="chip-x">×</span>
+    </div>`);
+  }
+  strip.innerHTML = chips.join('');
+  strip.classList.toggle('visible', chips.length > 0);
+}
+
+function clearPrice() {
+  priceMin = null; priceMax = null;
+  document.getElementById('min-price').value = '';
+  document.getElementById('max-price').value = '';
+  renderProducts();
+  updateChips();
+  updateBadge();
+}
+
+function updateBadge() {
+  let count = 0;
+  if (activeCategory !== 'Все') count++;
+  if (activeSize) count++;
+  if (priceMin !== null || priceMax !== null) count++;
+  const badge = document.getElementById('menu-badge');
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── SORT ──
+function sortProducts(products) {
+  const sortBy = document.getElementById('sort').value;
+  const sorted = [...products];
+  switch (sortBy) {
+    case 'price-asc':
+      sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      break;
+    case 'price-desc':
+      sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      break;
+    case 'name':
+      sorted.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+      break;
+    case 'newest':
+      sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
+      break;
+    default:
+      break;
+  }
+  return sorted;
+}
+
+// ── RENDER ──
+function isUrl(s) { return s && (s.startsWith('http') || s.startsWith('/')); }
+
+function renderProducts() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+
+  let filtered = allProducts.filter(p => {
+    const mc = activeCategory === 'Все' || p.category === activeCategory;
+    const ms = !activeSize || (p.sizes && p.sizes.includes(activeSize));
+    const mq = !q || p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q);
+    const mp = (priceMin === null || p.price >= priceMin) && (priceMax === null || p.price <= priceMax);
+    return mc && ms && mq && mp;
+  });
+
+  filtered = sortProducts(filtered);
+
+  const grid = document.getElementById('grid');
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="no-results">Товаров не найдено.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((p, i) => {
+    const imgs = Array.isArray(p.images) && p.images.length ? p.images : ['👕'];
+    const src  = imgs[0];
+    const imgTag = isUrl(src)
+      ? `<img src="${src}" alt="${p.name}" loading="lazy" onerror="this.remove()">`
+      : `<span class="ep">${src}</span>`;
+    const dots = imgs.length > 1
+      ? `<div class="img-dots">${imgs.map((_,di) => `<div class="img-dot${di===0?' active':''}"></div>`).join('')}</div>`
+      : '';
+    const badge = p.badge
+      ? `<span class="badge${p.badge==='hot'?' hot':''}">${p.badge==='new'?'Новинка':'🔥 Хит'}</span>`
+      : '';
+    return `
+      <div class="card" style="animation-delay:${i*.04}s" onclick="openModal(${p.id})">
+        <div class="card-img">${imgTag}${badge}${dots}</div>
+        <div class="card-body">
+          <div class="card-cat">${p.category||''}</div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-desc">${p.description||''}</div>
+          <div class="card-footer">
+            <div class="card-price">${(p.price||0).toLocaleString('ru')}<span> сум</span></div>
+            <button class="order-btn" onclick="event.stopPropagation();openModal(${p.id})">Заказать</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── MODAL ──
+function gShow(idx) {
+  gIdx = (idx + gImgs.length) % gImgs.length;
+  document.getElementById('gallery-track').style.transform = `translateX(-${gIdx*100}%)`;
+  document.querySelectorAll('.g-dot').forEach((d,i) => d.classList.toggle('active', i===gIdx));
+}
+function galleryNav(dir) { gShow(gIdx + dir); }
+
+let touchX = 0;
+document.getElementById('modal-gallery').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, {passive:true});
+document.getElementById('modal-gallery').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 40) galleryNav(dx < 0 ? 1 : -1);
+}, {passive:true});
+
+function openModal(id) {
+  currentProduct = allProducts.find(p => p.id === id);
+  if (!currentProduct) return;
+  selectedSize = '';
+  const p = currentProduct;
+
+  gImgs = Array.isArray(p.images) && p.images.length ? p.images : ['👕'];
+  gIdx = 0;
+  const track = document.getElementById('gallery-track');
+  track.style.transition = 'none';
+  track.style.transform  = 'translateX(0)';
+  track.innerHTML = gImgs.map(src => {
+    const inner = isUrl(src)
+      ? `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+      : src;
+    return `<div class="gallery-slide">${inner}</div>`;
+  }).join('');
+  document.getElementById('g-dots').innerHTML = gImgs.map((_,i) =>
+    `<div class="g-dot${i===0?' active':''}" onclick="gShow(${i})"></div>`
+  ).join('');
+  const showArrows = gImgs.length > 1;
+  document.getElementById('g-prev').style.display = showArrows ? 'flex' : 'none';
+  document.getElementById('g-next').style.display = showArrows ? 'flex' : 'none';
+  requestAnimationFrame(() => { track.style.transition = ''; });
+
+  document.getElementById('modal-cat').textContent  = p.category||'';
+  document.getElementById('modal-name').textContent = p.name||'';
+  document.getElementById('modal-desc').textContent = p.description||'';
+  document.getElementById('modal-price').textContent = (p.price||0).toLocaleString('ru') + ' сум';
+
+  const sizeBtns = document.getElementById('size-btns');
+  const sizes = Array.isArray(p.sizes) ? p.sizes : [];
+  if (sizes.length) {
+    sizeBtns.innerHTML = sizes.map(s =>
+      `<button class="size-btn" onclick="selectSize('${s}',this)">${s}</button>`
+    ).join('');
+    document.querySelector('.modal-sizes').style.display = '';
+  } else {
+    sizeBtns.innerHTML = '';
+    document.querySelector('.modal-sizes').style.display = 'none';
+  }
+
+  const orderBtn = document.getElementById('modal-order-btn');
+  if (!p.in_stock) {
+    orderBtn.textContent = 'Нет в наличии';
+    orderBtn.disabled = true;
+    orderBtn.style.opacity = '.5';
+  } else {
+    orderBtn.textContent = 'Заказать в Telegram';
+    orderBtn.disabled = false;
+    orderBtn.style.opacity = '';
+  }
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function selectSize(size, el) {
+  selectedSize = size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function orderProduct() {
+  if (!currentProduct || !currentProduct.in_stock) return;
+  const s = selectedSize ? ` | Размер: ${selectedSize}` : '';
+  const msg = encodeURIComponent(`Привет! Хочу заказать:\n\n👕 ${currentProduct.name}${s}\n💰 Цена: ${currentProduct.price.toLocaleString('ru')} сум`);
+  window.location.href = `tg://resolve?domain=${TG}&text=${msg}`;
+  setTimeout(() => window.open(`https://t.me/${TG}?text=${msg}`, '_blank'), 900);
+  closeModal();
+}
+
+// ── INIT ──
+loadData();
+setTimeout(() => document.getElementById('splash').classList.add('hide'), 2000);
+</script>
+</body>
+</html>

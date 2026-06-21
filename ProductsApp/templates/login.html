@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — khikmatillaev's Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --crimson:#AE1F23;--deep:#780000;--gold:#c9a96e;--gold-light:#e8d5b0;
+  --cream:#f9f5ee;--text:#1a0a0a;--muted:#7a5c5c;--border:rgba(174,31,35,0.15);
+}
+body{
+  min-height:100vh;background:var(--deep);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Jost',sans-serif;padding:20px;
+}
+.box{
+  background:var(--cream);padding:44px 36px;width:100%;max-width:360px;
+  box-shadow:0 24px 80px rgba(0,0,0,.45);
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-style:italic;
+  color:var(--deep);display:block;text-align:center;margin-bottom:4px;
+}
+.sub{
+  font-size:.62rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);text-align:center;margin-bottom:32px;
+}
+label{display:block;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500;}
+input[type=password]{
+  width:100%;border:1px solid var(--border);padding:11px 14px;
+  font-family:'Jost',sans-serif;font-size:.9rem;outline:none;
+  transition:border-color .2s;background:#fff;border-radius:0;
+  -webkit-appearance:none;
+}
+input[type=password]:focus{border-color:var(--crimson);}
+.error{color:var(--crimson);font-size:.76rem;margin:8px 0 0;display:block;}
+.btn{
+  width:100%;background:var(--deep);color:#fff;border:none;
+  padding:13px;font-family:'Jost',sans-serif;font-weight:500;
+  font-size:.82rem;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:background .2s;margin-top:16px;
+}
+.btn:hover{background:var(--crimson);}
+</style>
+</head>
+<body>
+<div class="box">
+  <span class="logo">khikmatillaev's</span>
+  <div class="sub">Панель управления</div>
+  <form method="post" action="/admin/login">
+    {% csrf_token %}
+    <label>Пароль</label>
+    <input type="password" name="password" placeholder="••••••••" autofocus required>
+    {% if error %}<span class="error">{{ error }}</span>{% endif %}
+    <button type="submit" class="btn">Войти</button>
+  </form>
+</div>
+</body>
+</html>
