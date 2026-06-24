@@ -1,0 +1,928 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог — khikmatillaev's</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --crimson: #AE1F23;
+            --deep: #780000;
+            --gold: #c9a96e;
+            --gold-light: #e8d5b0;
+            --cream: #f9f5ee;
+            --text: #1a0a0a;
+            --muted: #7a5c5c;
+            --border: rgba(174, 31, 35, 0.15);
+        }
+
+        body {
+            background: var(--cream);
+            color: var(--text);
+            font-family: 'Jost', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(80, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 169, 110, .2);
+            padding: 16px 40px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            color: rgba(232, 213, 176, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--gold);
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .catalog-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* ── FILTERS ── */
+        .filters {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            height: fit-content;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--deep);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-group {
+            margin-bottom: 25px;
+        }
+
+        .filter-group h4 {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--crimson);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--crimson);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .price-inputs {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .price-inputs input {
+            flex: 1 1 120px;
+            min-width: 0;
+            max-width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .price-inputs input:focus {
+            outline: none;
+            border-color: var(--crimson);
+        }
+
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: rgba(174, 31, 35, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--crimson);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .btn-reset:hover {
+            background: var(--crimson);
+            color: #fff;
+        }
+
+        /* ── PRODUCTS ── */
+        .products-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .products-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--deep);
+            font-style: italic;
+        }
+
+        .sort-select {
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #fff;
+            color: var(--text);
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--crimson);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(174, 31, 35, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image.has-photo {
+            color: transparent;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--crimson);
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: var(--deep);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .product-category {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--crimson);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .product-status {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background: rgba(174, 31, 35, 0.1);
+            color: var(--crimson);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .product-status.out-of-stock {
+            background: rgba(122, 92, 92, 0.1);
+            color: var(--muted);
+        }
+
+        .btn-detail {
+            width: 100%;
+            padding: 12px;
+            background: var(--deep);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Jost', sans-serif;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-detail:hover {
+            background: var(--crimson);
+        }
+
+        .product-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .product-modal.open {
+            display: flex;
+        }
+
+        .product-modal-box {
+            width: min(800px, 100%);
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(174, 31, 35, 0.08);
+            color: var(--deep);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .modal-image {
+            min-height: 100%;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            text-transform: uppercase;
+            padding: 24px;
+        }
+
+        .modal-image.has-photo {
+            color: transparent;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-body h3 {
+            margin-bottom: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--deep);
+            font-style: italic;
+        }
+
+        .modal-body .modal-category,
+        .modal-body .modal-price,
+        .modal-body .product-stock {
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .product-stock.in-stock {
+            color: var(--deep);
+            font-weight: 700;
+        }
+
+        .product-stock.out-of-stock {
+            color: var(--muted);
+        }
+
+        .modal-body p {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .size-pill {
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .size-pill.selected,
+        .size-pill:hover {
+            border-color: var(--crimson);
+            background: rgba(174, 31, 35, 0.08);
+            color: var(--crimson);
+        }
+
+        .size-pill.empty {
+            cursor: default;
+            border-color: var(--border);
+            color: var(--muted);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-order {
+            padding: 14px 24px;
+            background: var(--deep);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+
+        .btn-order:hover {
+            background: var(--crimson);
+        }
+
+        .btn-order:disabled {
+            background: rgba(174, 31, 35, 0.25);
+            cursor: not-allowed;
+        }
+
+        .modal-secondary {
+            padding: 14px 24px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--deep);
+            margin-bottom: 10px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .catalog-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .filters {
+                display: none;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            nav {
+                gap: 15px;
+            }
+
+            nav a {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">khikmatillaev's</a>
+            <nav>
+                <a href="/#about">О нас</a>
+                <a href="/catalog/" class="active">Товары</a>
+                <a href="/#faq">FAQ</a>
+                <a href="/#contacts">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CATALOG -->
+    <div class="catalog-container">
+        <!-- FILTERS -->
+        <aside class="filters">
+            <div class="filter-title">Фильтры</div>
+
+            <div class="filter-group">
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск товаров...">
+            </div>
+
+            <div class="filter-group">
+                <h4>Категория</h4>
+                <div class="checkbox-group" id="categoryFilter">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="all-categories" checked>
+                        <label for="all-categories">Все категории</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Размер</h4>
+                <div class="checkbox-group" id="sizeFilter">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Цена</h4>
+                <div class="price-inputs">
+                    <input type="number" id="priceMin" placeholder="От" min="0">
+                    <input type="number" id="priceMax" placeholder="До" min="0">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Статус</h4>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="inStock" checked>
+                        <label for="inStock">В наличии</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="badgeNew">
+                        <label for="badgeNew">Новинки</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-reset" onclick="resetFilters()">Сбросить фильтры</button>
+        </aside>
+
+        <!-- PRODUCTS -->
+        <main class="products-section">
+            <div class="products-header">
+                <h2 class="products-title">Каталог товаров</h2>
+                <select class="sort-select" id="sortSelect" onchange="sortProducts()">
+                    <option value="default">По умолчанию</option>
+                    <option value="price-asc">Цена: по возрастанию</option>
+                    <option value="price-desc">Цена: по убыванию</option>
+                    <option value="name-asc">Название: А-Я</option>
+                </select>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <!-- Товары будут загружены здесь -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h3>Товаров не найдено</h3>
+                <p>Попробуйте изменить параметры фильтра</p>
+            </div>
+        </main>
+    </div>
+
+    <div class="product-modal" id="product-modal" onclick="if(event.target.id==='product-modal') closeProductModal();">
+        <div class="product-modal-box">
+            <button class="modal-close" onclick="closeProductModal()">✕</button>
+            <div class="modal-grid">
+                <div class="modal-image" id="modal-image">Фото товара</div>
+                <div class="modal-body">
+                    <h3 id="modal-name">Название</h3>
+                    <div class="modal-category" id="modal-category">Категория</div>
+                    <div class="modal-price" id="modal-price">Цена</div>
+                    <div class="product-stock" id="modal-stock">В наличии</div>
+                    <p id="modal-desc">Описание товара.</p>
+                    <div>
+                        <div class="filter-title" style="margin-bottom:12px;">Выберите размер</div>
+                        <div id="modal-sizes" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-order" id="order-button" type="button" onclick="orderTelegram()">Заказать</button>
+                        <button class="modal-secondary" type="button" onclick="closeProductModal()">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // Загрузка товаров с API
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products/');
+                allProducts = await response.json();
+                await loadFiltersData();
+                renderProducts(allProducts);
+                setupEventListeners();
+            } catch (error) {
+                console.error('Ошибка загрузки товаров:', error);
+            }
+        }
+
+        // Загрузка данных для фильтров
+        async function loadFiltersData() {
+            try {
+                // Категории
+                const categoriesResponse = await fetch('/api/products/categories/');
+                const categoriesData = await categoriesResponse.json();
+                const categories = categoriesData.categories || [];
+                
+                const categoryFilter = document.getElementById('categoryFilter');
+                categories.forEach(cat => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="cat-${cat}" value="${cat}" onchange="applyFilters()">
+                        <label for="cat-${cat}">${cat}</label>
+                    `;
+                    categoryFilter.appendChild(div);
+                });
+
+                // Размеры
+                const sizesResponse = await fetch('/api/products/sizes/');
+                const sizesData = await sizesResponse.json();
+                const sizes = sizesData.sizes || [];
+                
+                const sizeFilter = document.getElementById('sizeFilter');
+                sizes.forEach(size => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="size-${size}" value="${size}" onchange="applyFilters()">
+                        <label for="size-${size}">${size}</label>
+                    `;
+                    sizeFilter.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки фильтров:', error);
+            }
+        }
+
+        // Настройка слушателей событий
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('priceMin').addEventListener('input', applyFilters);
+            document.getElementById('priceMax').addEventListener('input', applyFilters);
+            document.getElementById('inStock').addEventListener('change', applyFilters);
+            document.getElementById('badgeNew').addEventListener('change', applyFilters);
+            document.getElementById('all-categories').addEventListener('change', (e) => {
+                document.querySelectorAll('[id^="cat-"]').forEach(el => el.checked = e.target.checked);
+                applyFilters();
+            });
+        }
+
+        // Применить фильтры
+        function applyFilters() {
+            filteredProducts = allProducts.filter(product => {
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const priceMin = parseInt(document.getElementById('priceMin').value) || 0;
+                const priceMax = parseInt(document.getElementById('priceMax').value) || Infinity;
+                const inStock = document.getElementById('inStock').checked;
+                const isNew = document.getElementById('badgeNew').checked;
+
+                // Проверка поиска
+                if (!product.name.toLowerCase().includes(search)) return false;
+
+                // Проверка цены
+                if (product.price < priceMin || product.price > priceMax) return false;
+
+                // Проверка наличия
+                if (inStock && !product.in_stock) return false;
+
+                // Проверка новинки
+                if (isNew && product.badge !== 'new') return false;
+
+                // Проверка категории
+                const selectedCategories = Array.from(document.querySelectorAll('[id^="cat-"]:checked')).map(el => el.value);
+                if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false;
+
+                // Проверка размеров
+                const selectedSizes = Array.from(document.querySelectorAll('[id^="size-"]:checked')).map(el => el.value);
+                if (selectedSizes.length > 0 && !selectedSizes.some(size => product.sizes.includes(size))) return false;
+
+                return true;
+            });
+
+            renderProducts(filteredProducts);
+        }
+
+        // Сортировка товаров
+        function sortProducts() {
+            const sortBy = document.getElementById('sortSelect').value;
+            const sorted = [...filteredProducts];
+
+            switch (sortBy) {
+                case 'price-asc':
+                    sorted.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    sorted.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name-asc':
+                    sorted.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+
+            renderProducts(sorted);
+        }
+
+        // Рендеринг товаров
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (products.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = products.map(product => {
+                const image = Array.isArray(product.images) ? product.images[0] : product.images;
+                const hasPhoto = image && (typeof image === 'string') && (image.startsWith('http') || image.startsWith('/'));
+                const imageStyle = hasPhoto ? `background-image:url('${image}');` : '';
+                return `
+                <div class="product-card">
+                    <div class="product-image ${hasPhoto ? 'has-photo' : ''}" style="${imageStyle}">
+                        ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
+                        ${hasPhoto ? '' : 'Фото товара'}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${product.category}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString('ru-RU')} сум</div>
+                        <div class="product-status ${!product.in_stock ? 'out-of-stock' : ''}">
+                            ${product.in_stock ? 'В наличии' : 'Нет в наличии'}
+                        </div>
+                        <button class="btn-detail" onclick="viewProductDetail(${product.id})">
+                            Подробнее
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        let PRODUCT_DETAIL = null;
+        let SELECTED_SIZE = null;
+
+        function viewProductDetail(productId) {
+            PRODUCT_DETAIL = allProducts.find(item => item.id === productId);
+            if (!PRODUCT_DETAIL) return;
+
+            SELECTED_SIZE = null;
+            const image = Array.isArray(PRODUCT_DETAIL.images) ? PRODUCT_DETAIL.images[0] : PRODUCT_DETAIL.images;
+            const hasPhoto = image && (typeof image === 'string') && (image.startsWith('http') || image.startsWith('/'));
+            const imageElement = document.getElementById('modal-image');
+            imageElement.style.backgroundImage = hasPhoto ? `url('${image}')` : '';
+            imageElement.classList.toggle('has-photo', hasPhoto);
+            imageElement.textContent = hasPhoto ? '' : 'Фото товара';
+
+            document.getElementById('modal-name').textContent = PRODUCT_DETAIL.name;
+            document.getElementById('modal-category').textContent = PRODUCT_DETAIL.category;
+            document.getElementById('modal-price').textContent = `${PRODUCT_DETAIL.price.toLocaleString('ru-RU')} сум`;
+            document.getElementById('modal-desc').textContent = PRODUCT_DETAIL.description || 'Описание товара пока отсутствует.';
+            document.getElementById('modal-stock').textContent = PRODUCT_DETAIL.in_stock ? 'В наличии' : 'Нет в наличии';
+            document.getElementById('modal-stock').className = PRODUCT_DETAIL.in_stock ? 'product-stock in-stock' : 'product-stock out-of-stock';
+
+            const sizesContainer = document.getElementById('modal-sizes');
+            sizesContainer.innerHTML = '';
+            const sizes = Array.isArray(PRODUCT_DETAIL.sizes) ? PRODUCT_DETAIL.sizes : [];
+            if (sizes.length === 0) {
+                sizesContainer.innerHTML = '<div class="size-pill empty">Размеры не указаны</div>';
+            } else {
+                sizes.forEach(size => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'size-pill';
+                    button.textContent = size;
+                    button.onclick = () => selectModalSize(size, button);
+                    sizesContainer.appendChild(button);
+                });
+            }
+
+            document.getElementById('order-button').disabled = !PRODUCT_DETAIL.in_stock || sizes.length === 0;
+            document.getElementById('product-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function selectModalSize(size, button) {
+            SELECTED_SIZE = size;
+            document.querySelectorAll('.size-pill').forEach(el => el.classList.toggle('selected', el === button));
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        const ADMIN_TG = "{{ admin_tg }}";
+
+        function orderTelegram() {
+            if (!PRODUCT_DETAIL) return;
+            if (!PRODUCT_DETAIL.in_stock) {
+                alert('Товар сейчас не в наличии');
+                return;
+            }
+            if (!SELECTED_SIZE) {
+                alert('Выберите размер');
+                return;
+            }
+
+            const text =
+                `Привет! Хочу заказать:\n\n` +
+                `👕 ${PRODUCT_DETAIL.name} | Размер: ${SELECTED_SIZE}\n` +
+                `💰 Цена: ${PRODUCT_DETAIL.price.toLocaleString('ru-RU')} сум\n\n` +
+                `Ожидаю подтверждения заказа!`;
+
+            const url = `https://t.me/${ADMIN_TG}?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+            closeProductModal();
+        }
+
+        // Сброс фильтров
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('priceMin').value = '';
+            document.getElementById('priceMax').value = '';
+            document.getElementById('inStock').checked = true;
+            document.getElementById('badgeNew').checked = false;
+            document.getElementById('all-categories').checked = true;
+            document.querySelectorAll('[id^="cat-"]').forEach(el => el.checked = false);
+            document.querySelectorAll('[id^="size-"]').forEach(el => el.checked = false);
+            applyFilters();
+        }
+
+        // Загрузить товары при загрузке страницы
+        loadProducts();
+    </script>
+</body>
+</html>

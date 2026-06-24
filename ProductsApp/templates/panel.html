@@ -70,18 +70,58 @@ body{background:var(--cream);color:var(--text);font-family:'Jost',sans-serif;min
 .form-field{display:flex;flex-direction:column;gap:4px;}
 .form-field.full{grid-column:1/-1;}
 .form-field label{font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:500;}
-.form-field input,.form-field select,.form-field textarea{
+.form-field input:not([type=checkbox]),.form-field select,.form-field textarea{
   border:1px solid var(--border);padding:9px 11px;font-family:'Jost',sans-serif;
   font-size:.87rem;outline:none;transition:border-color .2s;background:#fff;
   resize:vertical;-webkit-appearance:none;border-radius:0;
 }
+.form-field input[type=checkbox]{
+  -webkit-appearance:auto;
+  appearance:auto;
+}
 .form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--crimson);}
 .hint{font-size:.62rem;color:var(--muted);line-height:1.4;margin-top:2px;}
 .sizes-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;}
-.size-check{display:flex;align-items:center;gap:5px;cursor:pointer;}
-.size-check input{width:16px;height:16px;accent-color:var(--crimson);cursor:pointer;}
-.size-check span{font-size:.82rem;font-weight:500;}
+.size-check{
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  padding:6px 10px;border:2px solid transparent;border-radius:4px;
+  transition:all 0.2s ease;
+  background:rgba(174,31,35,0.05);
+}
+.size-check:hover{background:rgba(174,31,35,0.12);border-color:rgba(174,31,35,0.3);}
+.size-check input:checked~span{color:var(--crimson);font-weight:600;}
+.size-check input{
+  width:18px;height:18px;
+  accent-color:var(--crimson);
+  cursor:pointer;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:#fff;
+}
+.size-check input:checked{
+  border-color:var(--crimson);
+  background:var(--crimson);
+}
+.size-check span{font-size:.82rem;font-weight:500;transition:color 0.2s;}
 .form-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.stock-label{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:8px 12px;border:2px solid transparent;border-radius:4px;
+  transition:all 0.2s;background:rgba(174,31,35,0.05);
+}
+.stock-label:hover{background:rgba(174,31,35,0.12);border-color:rgba(174,31,35,0.3);}
+.stock-label input{
+  width:18px;height:18px;
+  accent-color:var(--crimson);
+  cursor:pointer;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:#fff;
+}
+.stock-label input:checked{
+  border-color:var(--crimson);
+  background:var(--crimson);
+}
 .img-preview{
   width:52px;height:52px;background:#f0e8e0;border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;font-size:1.4rem;
@@ -162,6 +202,12 @@ tr:hover td{background:#fdf9f5;}
 </div>
 
 <div class="admin-body">
+  {% if order_info %}
+  <div style="margin-bottom:20px;padding:16px;border:1px solid #d2b37d;background:#fff9eb;color:#5b3d18;">
+    <strong>Новый заказ:</strong> {{ order_info.name }} (ID: {{ order_info.id }}), размер {{ order_info.size }}.
+  </div>
+  {% endif %}
+
   <!-- STATS -->
   <div class="stats">
     <div class="stat"><div class="stat-label">Всего товаров</div><div class="stat-value">{{ stats.total }}</div></div>
@@ -173,7 +219,13 @@ tr:hover td{background:#fdf9f5;}
   <!-- ADD FORM -->
   <div class="section-header">
     <span class="section-title">Каталог</span>
-    <button class="btn-primary" onclick="toggleForm()">+ Добавить товар</button>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <form method="get" action="/admin/panel" style="display:flex;gap:10px;align-items:center;">
+        <input type="text" name="search_id" placeholder="Поиск по ID" value="{{ search_id }}" style="padding:10px 12px;border:1px solid var(--border);border-radius:6px;">
+        <button type="submit" class="btn-secondary">Найти</button>
+      </form>
+      <button class="btn-primary" onclick="toggleForm()">+ Добавить товар</button>
+    </div>
   </div>
 
   <div class="product-form" id="add-form">
@@ -231,8 +283,8 @@ tr:hover td{background:#fdf9f5;}
           </div>
         </div>
         <div class="form-field">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" name="in_stock" value="on" checked style="width:16px;height:16px;accent-color:var(--crimson);">
+          <label class="stock-label">
+            <input type="checkbox" name="in_stock" value="on" checked>
             В наличии
           </label>
         </div>
@@ -249,6 +301,7 @@ tr:hover td{background:#fdf9f5;}
     <table>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Фото</th>
           <th>Товар</th>
           <th>Цена</th>
@@ -262,6 +315,9 @@ tr:hover td{background:#fdf9f5;}
         {% if products %}
           {% for p in products %}
           <tr>
+            <td>
+              <div style="font-weight:600;color:var(--muted);min-width:56px;">{{ p.id }}</div>
+            </td>
             <td>
               <div class="thumb">
                 {% with first_img=p.images|first %}
@@ -299,8 +355,8 @@ tr:hover td{background:#fdf9f5;}
             </td>
           </tr>
           {% endfor %}
-        {% else %}
-          <tr><td colspan="7" class="empty">Нет товаров. Добавьте первый.</td></tr>
+          {% else %}
+          <tr><td colspan="8" class="empty">Нет товаров. Добавьте первый.</td></tr>
         {% endif %}
       </tbody>
     </table>
@@ -360,8 +416,8 @@ tr:hover td{background:#fdf9f5;}
           </div>
         </div>
         <div class="form-field">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" name="in_stock" id="e-stock" value="on" style="width:16px;height:16px;accent-color:var(--crimson);">
+          <label class="stock-label">
+            <input type="checkbox" name="in_stock" id="e-stock" value="on">
             В наличии
           </label>
         </div>

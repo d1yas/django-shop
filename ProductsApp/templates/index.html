@@ -133,21 +133,6 @@ header {
   display: block;
   transition: transform .3s, opacity .3s;
 }
-.menu-badge {
-  position: absolute;
-  top: -5px; right: -5px;
-  background: var(--crimson);
-  color: #fff;
-  font-size: .5rem;
-  font-weight: 600;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Jost', sans-serif;
-}
-
 /* SIDEBAR */
 .sidebar-overlay {
   position: fixed; inset: 0;
@@ -530,7 +515,6 @@ footer a:hover { color:var(--gold); }
     <span></span>
     <span></span>
     <span></span>
-    <span class="menu-badge" id="menu-badge">0</span>
   </button>
 </div>
 
@@ -800,17 +784,7 @@ function clearPrice() {
 }
 
 function updateBadge() {
-  let count = 0;
-  if (activeCategory !== 'Все') count++;
-  if (activeSize) count++;
-  if (priceMin !== null || priceMax !== null) count++;
-  const badge = document.getElementById('menu-badge');
-  if (count > 0) {
-    badge.textContent = count;
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
-  }
+  // Badge removed - no action needed
 }
 
 // ── SORT ──

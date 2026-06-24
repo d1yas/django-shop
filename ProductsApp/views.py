@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.decorators import method_decorator
@@ -9,11 +10,44 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import urllib.request
+import urllib.parse
 
 import json
 
 from .models import Product
 from .serializers import ProductSerializer, ProductWriteSerializer
+
+
+# ─────────────────────────────────────────────
+# PUBLIC PAGES (главная страница и каталог)
+# ─────────────────────────────────────────────
+
+class HomePageView(View):
+    """
+    GET /  → показывает главную страницу (home.html)
+    """
+    template_name = 'home.html'
+
+    def get(self, request):
+        # Передаём опциональный Telegram-юзернейм администратора в шаблон
+        return render(request, self.template_name, {
+            'admin_tg': getattr(settings, 'ADMIN_TG_USERNAME', ''),
+        })
+
+
+class CatalogPageView(View):
+    """
+    GET /catalog/  → показывает каталог товаров (catalog.html)
+    """
+    template_name = 'catalog.html'
+
+    def get(self, request):
+        # Передаём опциональный Telegram-юзернейм и numeric id администратора
+        return render(request, self.template_name, {
+            'admin_tg': getattr(settings, 'ADMIN_TG_USERNAME', ''),
+            'admin_tg_id': getattr(settings, 'ADMIN_TG_ID', ''),
+        })
 
 
 # ─────────────────────────────────────────────
@@ -110,16 +144,32 @@ class AdminLoginView(View):
         return render(request, self.template_name)
 
     def post(self, request):
+        username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-        # Используем стандартного superuser Django: имя берём из настроек
-        admin_username = getattr(settings, 'ADMIN_USERNAME', 'admin')
-        user = authenticate(request, username=admin_username, password=password)
-
-        if user is not None and user.is_staff:
+        
+        # Проверка на пустые поля
+        if not username or not password:
+            return render(request, self.template_name, {'error': 'Заполните все поля'})
+        
+        # Попытка аутентификации
+        user = authenticate(request, username=username, password=password)
+        
+        if user is None:
+            # Проверяем, существует ли пользователь
+            try:
+                User.objects.get(username=username)
+                # Пользователь существует, но пароль неверный
+                return render(request, self.template_name, {'error': 'Неверный пароль'})
+            except User.DoesNotExist:
+                # Пользователь не найден
+                return render(request, self.template_name, {'error': 'Пользователь не найден'})
+        
+        # Проверяем права доступа
+        if user.is_staff:
             login(request, user)
             return redirect('admin_panel')
-
-        return render(request, self.template_name, {'error': 'Неверный пароль'})
+        else:
+            return render(request, self.template_name, {'error': 'У вас нет прав доступа'})
 
 
 class AdminLogoutView(View):
@@ -144,14 +194,29 @@ class AdminPanelView(View):
     """
     template_name = 'panel.html'
 
-    def _get_context(self):
+    def _get_context(self, request):
+        search_id = request.GET.get('search_id', '').strip()
+        order_product_id = request.GET.get('product_id', '').strip()
+        order_size = request.GET.get('size', '').strip()
+        order_name = request.GET.get('name', '').strip()
+
         products = Product.objects.all()
+        if search_id.isdigit():
+            products = products.filter(id=int(search_id))
+
         stats = {
             'total': products.count(),
             'cats' : products.values('category').distinct().count(),
             'new'  : products.filter(badge='new').count(),
             'hot'  : products.filter(badge='hot').count(),
         }
+        order_info = None
+        if order_product_id and order_size:
+            order_info = {
+                'id': order_product_id,
+                'name': order_name,
+                'size': order_size,
+            }
         # Сериализованные продукты для JS (openEdit)
         products_json = json.dumps([
             {
@@ -172,10 +237,12 @@ class AdminPanelView(View):
             'products_json': products_json,
             'stats'    : stats,
             'sizes_all': SIZES_ALL,
+            'search_id': search_id,
+            'order_info': order_info,
         }
 
     def get(self, request):
-        return render(request, self.template_name, self._get_context())
+        return render(request, self.template_name, self._get_context(request))
 
 
 # ─────────────────────────────────────────────
@@ -226,6 +293,45 @@ class AdminProductCreateView(APIView):
         if hasattr(request, 'accepted_media_type'):
             return 'text/html' in request.accepted_media_type
         return True
+
+
+class SendOrderAPIView(APIView):
+    """
+    POST /api/send_order/
+    Accepts JSON: { product_id, name, size, price, contact (optional) }
+    Sends a message to admin via Telegram Bot API using settings.TELEGRAM_BOT_TOKEN
+    and settings.ADMIN_TG_ID.
+    """
+
+    def post(self, request):
+        bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+        admin_chat = getattr(settings, 'ADMIN_TG_ID', '')
+
+        if not bot_token or not admin_chat:
+            return Response({'detail': 'Bot token or admin chat id not configured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        data = request.data if hasattr(request, 'data') else request.POST
+        name = data.get('name') or ''
+        size = data.get('size') or ''
+        price = data.get('price') or ''
+
+        size_part = f" | Размер: {size}" if size else ''
+        text = (
+            "Привет! Хочу заказать:\n\n"
+            f"👕 {name}{size_part}\n"
+            f"💰 Цена: {price}\n\n"
+            "Ожидаю подтверждения заказа!"
+        )
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        payload = {'chat_id': admin_chat, 'text': text}
+        data_encoded = urllib.parse.urlencode(payload).encode()
+        req = urllib.request.Request(url, data=data_encoded)
+        try:
+            resp = urllib.request.urlopen(req, timeout=10)
+            return Response({'ok': True}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'ok': False, 'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
 
 @method_decorator(login_required(login_url='/admin/login'), name='dispatch')

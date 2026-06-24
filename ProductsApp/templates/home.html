@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>khikmatillaev's - Эксклюзивная одежда</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --crimson: #AE1F23;
+            --deep: #780000;
+            --gold: #c9a96e;
+            --gold-light: #e8d5b0;
+            --cream: #f9f5ee;
+            --text: #1a0a0a;
+            --muted: #7a5c5c;
+            --border: rgba(174, 31, 35, 0.15);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--cream);
+            color: var(--text);
+            font-family: 'Jost', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(80, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 169, 110, .2);
+            padding: 16px 40px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            color: rgba(232, 213, 176, 0.9);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--gold);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(255, 255, 255, .05), transparent 35%),
+                        linear-gradient(160deg, #3d0000 0%, #780000 50%, #1a0000 100%);
+            color: var(--gold-light);
+            padding: 80px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(201, 169, 110, 0.18), transparent 25%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08), transparent 20%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 760px;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.4rem, 9vw, 5rem);
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        .hero-content p {
+            font-size: 1.15rem;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(232, 213, 176, 0.95);
+            font-weight: 300;
+            max-width: 740px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 16px 50px;
+            background: var(--crimson);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: 2px solid var(--crimson);
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--crimson);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 16px 50px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: 2px solid rgba(232, 213, 176, 0.35);
+            border-radius: 6px;
+            color: rgba(232, 213, 176, 0.95);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .hero-features {
+            padding: 70px 40px 40px;
+            background: #fff5ee;
+        }
+
+        .hero-features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 28px;
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid rgba(174, 31, 35, 0.08);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-number {
+            font-size: 0.9rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .feature-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--deep);
+            margin-bottom: 14px;
+        }
+
+        .feature-text {
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        /* ── SECTIONS ── */
+        section {
+            padding: 100px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-style: italic;
+            color: var(--deep);
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 50px;
+            line-height: 1.8;
+        }
+
+        /* ── О НАС ── */
+        #about {
+            background: var(--cream);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-text h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--deep);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, var(--crimson), var(--gold));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+        /* ── FAQ ── */
+        #faq {
+            background: rgba(174, 31, 35, 0.05);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: #fff;
+            border-left: 4px solid var(--crimson);
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 15px rgba(174, 31, 35, 0.1);
+        }
+
+        .faq-item h4 {
+            color: var(--deep);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .faq-item p {
+            color: var(--muted);
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+
+        .faq-item.active p {
+            max-height: none;
+        }
+
+        /* ── КОНТАКТЫ ── */
+        #contacts {
+            background: var(--cream);
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-item h3 {
+            color: var(--deep);
+            margin-bottom: 15px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        .contact-item p {
+            color: var(--muted);
+        }
+
+        .contact-item a {
+            color: var(--crimson);
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--deep);
+            color: var(--gold-light);
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid rgba(201, 169, 110, .2);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav {
+                gap: 20px;
+            }
+
+            nav a {
+                font-size: 0.85rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            section {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">khikmatillaev's</a>
+            <nav>
+                <a href="#about">О нас</a>
+                <a href="/catalog/">Товары</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contacts">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>khikmatillaev's</h1>
+            <p>Эксклюзивная одежда высокого качества</p>
+            <div class="hero-buttons">
+                <a href="/catalog/" class="btn-primary">Смотреть каталог</a>
+                <a href="#about" class="btn-secondary">О нас</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero-features">
+        <div class="hero-features-grid">
+            <div class="feature-card">
+                <div class="feature-number">01</div>
+                <div class="feature-title">Премиальные ткани</div>
+                <div class="feature-text">Каждая модель создаётся из лучших материалов с высокой плотностью и стойким цветом.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">02</div>
+                <div class="feature-title">Индивидуальный стиль</div>
+                <div class="feature-text">Контрастные решения, минимализм и элегантность в одной коллекции.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">03</div>
+                <div class="feature-title">Быстрое оформление</div>
+                <div class="feature-text">Закажите товар в пару кликов и получите готовое сообщение в Telegram.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- О НАС -->
+    <section id="about">
+        <h2 class="section-title">О нас</h2>
+        <div class="about-grid">
+            <div class="about-text">
+                <h3>Добро пожаловать</h3>
+                <p>
+                    khikmatillaev's — это мастерская, где рождается совершенство. Мы создаём эксклюзивную одежду 
+                    высочайшего качества, сочетая классические традиции с современным стилем.
+                </p>
+                <p>
+                    Каждое изделие тщательно отбирается и изготавливается с особым вниманием к деталям. 
+                    Мы используем только премиальные материалы, гарантирующие комфорт и долговечность.
+                </p>
+                <p>
+                    Наша миссия — предоставить вам одежду, которая не только выглядит потрясающе, 
+                    но и дарит ощущение уверенности и стиля.
+                </p>
+            </div>
+            <div class="about-image">
+                Коллекция премиум-класса
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+        <h2 class="section-title">Часто задаваемые вопросы</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <h4>Какие материалы вы используете?</h4>
+                <p>
+                    Мы используем только премиальные ткани от лучших мировых производителей. 
+                    Каждый материал проходит строгий контроль качества перед использованием.
+                </p>
+            </div>
+            <div class="faq-item">
+                <h4>Как долго доставка?</h4>
+                <p>
+                    Время доставки зависит от вашего местоположения. Обычно доставка занимает 3-7 рабочих дней. 
+                    Вы получите номер отслеживания при отправке заказа.
+                </p>
+            </div>
+            <div class="faq-item">
+                <h4>Можно ли вернуть товар?</h4>
+                <p>
+                    Да, мы предоставляем возможность вернуть товар в течение 30 дней после покупки. 
+                    Товар должен быть в оригинальном состоянии и неношеном виде.
+                </p>
+            </div>
+            <div class="faq-item">
+                <h4>Как выбрать правильный размер?</h4>
+                <p>
+                    На странице каждого товара представлена таблица размеров. Мы рекомендуем ознакомиться с ней перед покупкой. 
+                    Если у вас есть вопросы, свяжитесь с нашей поддержкой.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- КОНТАКТЫ -->
+    <section id="contacts">
+        <h2 class="section-title">Контакты</h2>
+        <div class="contacts-grid">
+            <div class="contact-item">
+                <h3>Телефон</h3>
+                <p><a href="tel:+998901234567">+998 90 123 45 67</a></p>
+            </div>
+            <div class="contact-item">
+                <h3>Email</h3>
+                <p><a href="mailto:info@khikmatillaev.com">info@khikmatillaev.com</a></p>
+            </div>
+            <div class="contact-item">
+                <h3>Instagram</h3>
+                <p><a href="https://instagram.com/khikmatillaev" target="_blank">@khikmatillaev</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 khikmatillaev's. Все права защищены.</p>
+    </footer>
+
+    <script>
+        // FAQ интерактивность
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -128,7 +128,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'ProductsApp' / 'static']
-ADMIN_USERNAME = 'admin'
+ADMIN_USERNAME = 'data_n0thing'
+# Telegram admin username used for prefilled order messages (without @)
+ADMIN_TG_USERNAME = ADMIN_USERNAME.lstrip('@') if 'ADMIN_USERNAME' in globals() else ''
+# Optional: numeric Telegram user id for the admin (use string)
+# If you provide this, the site will try to open chat by user id first.
+ADMIN_TG_ID = '8308279894'
+
+# Telegram bot token used to send orders to admin. Create a bot with @BotFather and
+# put its token here, e.g. '123456:ABC-DEF...'
+TELEGRAM_BOT_TOKEN = ''
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
