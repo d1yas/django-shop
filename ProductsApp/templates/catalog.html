@@ -218,6 +218,33 @@
             border-bottom: 2px solid var(--border);
         }
 
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-filter-toggle-mobile {
+            display: none;
+            padding: 10px 15px;
+            background: var(--deep);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Jost', sans-serif;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .btn-filter-toggle-mobile:hover {
+            background: var(--crimson);
+        }
+
         .products-title {
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.8rem;
@@ -609,6 +636,56 @@
 
         /* Mobile Landscape & Small Tablets (481px - 768px) */
         @media (max-width: 768px) {
+            .btn-filter-toggle-mobile {
+                display: block;
+            }
+
+            .filters {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--cream);
+                z-index: 150;
+                overflow-y: auto;
+                padding: 20px;
+            }
+
+            .filters.active {
+                display: block;
+            }
+
+            .filters .filter-close-btn {
+                display: block;
+                width: 100%;
+                padding: 12px;
+                background: var(--crimson);
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+                margin-bottom: 20px;
+                font-size: 1rem;
+            }
+
+            .header-controls {
+                flex-direction: row;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .btn-filter-toggle-mobile {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+
+            .sort-select {
+                flex: 1;
+            }
+
             header {
                 padding: 12px 20px;
             }
@@ -641,12 +718,23 @@
 
             .filters {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--cream);
+                z-index: 150;
+                overflow-y: auto;
+                padding: 20px;
             }
 
             .products-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
             .products-title {
@@ -909,13 +997,18 @@
         <main class="products-section">
             <div class="products-header">
                 <h2 class="products-title">Каталог товаров</h2>
-                <select class="sort-select" id="sortSelect" onchange="sortProducts()">
-                    <option value="default">По умолчанию</option>
-                    <option value="price-asc">Цена: по возрастанию</option>
-                    <option value="price-desc">Цена: по убыванию</option>
-                    <option value="name-asc">Название: А-Я</option>
-                    <option value="size-asc">Размер: по возрастанию</option>
-                </select>
+                <div class="header-controls">
+                    <button class="btn-filter-toggle-mobile" id="filterToggleBtn" onclick="toggleMobileFilters()">
+                        ☰ Фильтры
+                    </button>
+                    <select class="sort-select" id="sortSelect" onchange="sortProducts()">
+                        <option value="default">По умолчанию</option>
+                        <option value="price-asc">Цена: по возрастанию</option>
+                        <option value="price-desc">Цена: по убыванию</option>
+                        <option value="name-asc">Название: А-Я</option>
+                        <option value="size-asc">Размер: по возрастанию</option>
+                    </select>
+                </div>
             </div>
 
             <div class="products-grid" id="productsGrid">
@@ -1271,6 +1364,18 @@
             document.querySelectorAll('[id^="cat-"]').forEach(el => el.checked = false);
             document.querySelectorAll('[id^="size-"]').forEach(el => el.checked = false);
             applyFilters();
+        }
+
+        // Toggle mobile filters
+        function toggleMobileFilters() {
+            const filters = document.getElementById('filtersSidebar');
+            const closeBtn = filters.querySelector('.filter-close-btn');
+            const isActive = filters.classList.toggle('active');
+            
+            if (window.innerWidth <= 768) {
+                closeBtn.style.display = isActive ? 'block' : 'none';
+                document.body.style.overflow = isActive ? 'hidden' : '';
+            }
         }
 
         // Загрузить товары при загрузке страницы
