@@ -225,6 +225,7 @@ class AdminPanelView(View):
                 'category': p.category,
                 'description': p.description,
                 'price': p.price,
+                'discount_percent': p.discount_percent,
                 'badge': p.badge,
                 'in_stock': p.in_stock,
                 'images': p.images,
@@ -237,6 +238,7 @@ class AdminPanelView(View):
             'products_json': products_json,
             'stats'    : stats,
             'sizes_all': SIZES_ALL,
+            'sizes_all_json': json.dumps(SIZES_ALL),
             'search_id': search_id,
             'order_info': order_info,
         }

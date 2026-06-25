@@ -250,6 +250,10 @@ tr:hover td{background:#fdf9f5;}
           <input type="number" name="price" placeholder="290000" required min="0">
         </div>
         <div class="form-field">
+          <label>Скидка (%)</label>
+          <input type="number" name="discount_percent" placeholder="0" min="0" max="100" value="0">
+        </div>
+        <div class="form-field">
           <label>Значок</label>
           <select name="badge">
             <option value="">— Нет —</option>
@@ -282,6 +286,11 @@ tr:hover td{background:#fdf9f5;}
             {% endfor %}
           </div>
         </div>
+        <div class="form-field full">
+          <label>Размеры вручную (через запятую)</label>
+          <input type="text" name="sizes_raw" placeholder="42, 44, 46, универсальный">
+          <span class="hint">Если размера нет в чекбоксах, введите его вручную.</span>
+        </div>
         <div class="form-field">
           <label class="stock-label">
             <input type="checkbox" name="in_stock" value="on" checked>
@@ -305,6 +314,7 @@ tr:hover td{background:#fdf9f5;}
           <th>Фото</th>
           <th>Товар</th>
           <th>Цена</th>
+          <th>Скидка</th>
           <th>Размеры</th>
           <th>Метка</th>
           <th>Статус</th>
@@ -334,6 +344,13 @@ tr:hover td{background:#fdf9f5;}
               <div class="prod-cat">{{ p.category }}</div>
             </td>
             <td><div class="prod-price">{{ p.price|format_price }}</div></td>
+            <td>
+              {% if p.discount_percent > 0 %}
+                <span class="badge-tag badge-new">-{{ p.discount_percent }}%</span>
+              {% else %}
+                <span class="badge-tag badge-none">—</span>
+              {% endif %}
+            </td>
             <td><div class="sizes-list">{{ p.sizes|join:", " }}</div></td>
             <td>
               {% if p.badge == 'new' %}<span class="badge-tag badge-new">Новинка</span>
@@ -356,7 +373,7 @@ tr:hover td{background:#fdf9f5;}
           </tr>
           {% endfor %}
           {% else %}
-          <tr><td colspan="8" class="empty">Нет товаров. Добавьте первый.</td></tr>
+          <tr><td colspan="9" class="empty">Нет товаров. Добавьте первый.</td></tr>
         {% endif %}
       </tbody>
     </table>
@@ -382,6 +399,10 @@ tr:hover td{background:#fdf9f5;}
         <div class="form-field">
           <label>Цена (сум) *</label>
           <input type="number" name="price" id="e-price" required min="0">
+        </div>
+        <div class="form-field">
+          <label>Скидка (%)</label>
+          <input type="number" name="discount_percent" id="e-discount" min="0" max="100" value="0">
         </div>
         <div class="form-field">
           <label>Значок</label>
@@ -414,6 +435,11 @@ tr:hover td{background:#fdf9f5;}
             </label>
             {% endfor %}
           </div>
+        </div>
+        <div class="form-field full">
+          <label>Размеры вручную (через запятую)</label>
+          <input type="text" name="sizes_raw" id="e-sizes-raw" placeholder="42, 44, 46, универсальный">
+          <span class="hint">Если размера нет в чекбоксах, введите его вручную.</span>
         </div>
         <div class="form-field">
           <label class="stock-label">
@@ -457,14 +483,21 @@ function openEdit(id){
   document.getElementById('e-name').value=p.name;
   document.getElementById('e-cat').value=p.category;
   document.getElementById('e-price').value=p.price;
+  document.getElementById('e-discount').value=p.discount_percent||0;
   document.getElementById('e-badge').value=p.badge||'';
   document.getElementById('e-desc').value=p.description||'';
   const imgs=Array.isArray(p.images)?p.images:['👕'];
   document.getElementById('e-img').value=imgs.join(', ');
   previewImg(document.getElementById('e-img'),'edit-preview');
+  
+  // Get preset sizes from Django context
+  const presetSizes = new Set({{ sizes_all_json|safe }});
+  
   document.querySelectorAll('.e-size-cb').forEach(cb=>{
     cb.checked=Array.isArray(p.sizes)&&p.sizes.includes(cb.value);
   });
+  const extraSizes = Array.isArray(p.sizes) ? p.sizes.filter(size => !presetSizes.has(size)) : [];
+  document.getElementById('e-sizes-raw').value = extraSizes.join(', ');
   document.getElementById('e-stock').checked=p.in_stock;
   document.getElementById('edit-modal').classList.add('open');
   document.body.style.overflow='hidden';

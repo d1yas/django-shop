@@ -9,12 +9,13 @@ class Product(models.Model):
         ('hot', 'Хит'),
     ]
 
-    name        = models.CharField('Название', max_length=255)
-    category    = models.CharField('Категория', max_length=100)
-    description = models.TextField('Описание', blank=True, default='')
-    price       = models.PositiveIntegerField('Цена (сум)')
-    badge       = models.CharField('Значок', max_length=10, choices=BADGE_CHOICES, blank=True, default='')
-    in_stock    = models.BooleanField('В наличии', default=True)
+    name             = models.CharField('Название', max_length=255)
+    category         = models.CharField('Категория', max_length=100)
+    description      = models.TextField('Описание', blank=True, default='')
+    price            = models.PositiveIntegerField('Цена (сум)')
+    discount_percent = models.PositiveSmallIntegerField('Скидка (%)', default=0)
+    badge            = models.CharField('Значок', max_length=10, choices=BADGE_CHOICES, blank=True, default='')
+    in_stock         = models.BooleanField('В наличии', default=True)
 
     # SQLite не поддерживает ArrayField — храним как JSON-строку
     # Пример значения в БД: '["https://…/1.jpg", "https://…/2.jpg"]'

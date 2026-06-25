@@ -121,6 +121,7 @@
             margin-bottom: 20px;
             letter-spacing: 2px;
             font-weight: 400;
+            animation: fadeInUp 1s ease;
         }
 
         .hero-content p {
@@ -133,6 +134,7 @@
             max-width: 740px;
             margin-left: auto;
             margin-right: auto;
+            animation: fadeInUp 1s ease 0.2s both;
         }
 
         .hero-buttons {
@@ -140,6 +142,7 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 16px;
+            animation: fadeInUp 1s ease 0.4s both;
         }
 
         .btn-primary {
@@ -202,11 +205,16 @@
             border: 1px solid rgba(174, 31, 35, 0.08);
             box-shadow: 0 14px 40px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease both;
         }
 
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
         }
 
         .feature-number {
@@ -272,6 +280,7 @@
             color: var(--deep);
             margin-bottom: 20px;
             font-style: italic;
+            animation: slideInLeft 0.6s ease both;
         }
 
         .about-text p {
@@ -291,6 +300,7 @@
             color: #fff;
             font-style: italic;
             font-size: 1.2rem;
+            animation: slideInRight 0.6s ease both;
         }
 
         /* ── FAQ ── */
@@ -310,7 +320,13 @@
             margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            animation: fadeIn 0.5s ease both;
         }
+
+        .faq-item:nth-child(1) { animation-delay: 0.1s; }
+        .faq-item:nth-child(2) { animation-delay: 0.2s; }
+        .faq-item:nth-child(3) { animation-delay: 0.3s; }
+        .faq-item:nth-child(4) { animation-delay: 0.4s; }
 
         .faq-item:hover {
             box-shadow: 0 4px 15px rgba(174, 31, 35, 0.1);
@@ -346,7 +362,12 @@
 
         .contact-item {
             text-align: center;
+            animation: fadeInUp 0.6s ease both;
         }
+
+        .contact-item:nth-child(1) { animation-delay: 0.1s; }
+        .contact-item:nth-child(2) { animation-delay: 0.2s; }
+        .contact-item:nth-child(3) { animation-delay: 0.3s; }
 
         .contact-item h3 {
             color: var(--deep);
@@ -376,6 +397,66 @@
             text-align: center;
             padding: 30px;
             border-top: 1px solid rgba(201, 169, 110, .2);
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* ── RESPONSIVE ── */
@@ -538,6 +619,26 @@
             item.addEventListener('click', () => {
                 item.classList.toggle('active');
             });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.section-title, .section-subtitle, .about-text p, .contact-item h3').forEach(el => {
+            el.classList.add('animate-on-scroll');
+            observer.observe(el);
         });
     </script>
 </body>
