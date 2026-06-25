@@ -4,3 +4,7 @@ env/
 __pycache__/
 .env
 .idea
+
+ProductsApp/__pycache__/
+ProductsApp/migrations
+db.sqlite3

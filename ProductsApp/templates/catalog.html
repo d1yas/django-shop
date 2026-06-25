@@ -585,27 +585,257 @@
         .product-card:nth-child(6) { animation-delay: 0.3s; }
 
         /* ── RESPONSIVE ── */
+        
+        /* Tablets (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .catalog-container {
+                padding: 30px;
+                gap: 30px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 25px;
+            }
+
+            header {
+                padding: 14px 30px;
+            }
+
+            nav {
+                gap: 30px;
+            }
+        }
+
+        /* Mobile Landscape & Small Tablets (481px - 768px) */
         @media (max-width: 768px) {
+            header {
+                padding: 12px 20px;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            nav {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav a {
+                font-size: 0.85rem;
+                padding: 5px 8px;
+            }
+
             .catalog-container {
                 grid-template-columns: 1fr;
-                padding: 20px;
+                padding: 15px;
+                gap: 20px;
             }
 
             .filters {
                 display: none;
             }
 
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            .products-header {
+                flex-direction: column;
                 gap: 15px;
+                align-items: flex-start;
             }
 
-            nav {
-                gap: 15px;
+            .products-title {
+                font-size: 1.5rem;
+            }
+
+            .sort-select {
+                width: 100%;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .product-image {
+                height: 200px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+
+            .product-name {
+                font-size: 0.9rem;
+            }
+
+            .product-price {
+                font-size: 1.1rem;
+            }
+
+            .btn-detail {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            /* Modal optimization for mobile */
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-image {
+                min-height: 250px;
+                max-height: 300px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-body h3 {
+                font-size: 1.5rem;
+            }
+
+            .size-pill {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .btn-order,
+            .modal-secondary {
+                flex: 1;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Mobile Portrait (320px - 480px) */
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 15px;
+            }
+
+            .logo {
+                font-size: 1.3rem;
             }
 
             nav a {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
+                padding: 4px 6px;
+            }
+
+            .catalog-container {
+                padding: 10px;
+            }
+
+            .products-title {
+                font-size: 1.3rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .product-image {
+                height: 160px;
+            }
+
+            .product-info {
+                padding: 10px;
+            }
+
+            .product-category {
+                font-size: 0.7rem;
+            }
+
+            .product-name {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+            }
+
+            .product-price {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+
+            .product-status {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+                margin-bottom: 8px;
+            }
+
+            .btn-detail {
+                padding: 8px;
+                font-size: 0.75rem;
+            }
+
+            .product-badge {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+                top: 8px;
+                right: 8px;
+            }
+
+            /* Modal for small phones */
+            .product-modal {
+                padding: 10px;
+            }
+
+            .modal-image {
+                min-height: 200px;
+                max-height: 250px;
+            }
+
+            .modal-body {
+                padding: 15px;
+            }
+
+            .modal-body h3 {
+                font-size: 1.3rem;
+            }
+
+            .modal-body p {
+                font-size: 0.9rem;
+            }
+
+            .size-pill {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-order,
+            .modal-secondary {
+                width: 100%;
+            }
+        }
+
+        /* Extra Small Phones (< 320px) */
+        @media (max-width: 360px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .product-image {
+                height: 220px;
+            }
+
+            nav a {
+                font-size: 0.7rem;
+            }
+
+            .modal-body h3 {
+                font-size: 1.1rem;
             }
         }
     </style>
