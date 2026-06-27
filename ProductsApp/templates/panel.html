@@ -142,11 +142,35 @@ th{
 td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:.84rem;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fdf9f5;}
+.editable-cell{cursor:pointer;position:relative;padding:6px 12px;}
+.editable-cell:hover{background:rgba(174,31,35,0.05);}
+.editable-cell input{
+  width:100%;border:1px solid var(--crimson);padding:6px 8px;
+  font-family:'Jost',sans-serif;font-size:.84rem;outline:none;
+}
+.editable-cell.editing{padding:4px 8px;background:#fff;}
+.quick-save-indicator{
+  position:fixed;top:60px;right:20px;background:var(--deep);color:#fff;
+  padding:10px 16px;font-size:.75rem;border-radius:4px;z-index:100;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 .thumb{
   width:38px;height:38px;background:#f0e8e0;display:flex;align-items:center;
-  justify-content:center;font-size:1.1rem;overflow:hidden;flex-shrink:0;
+  justify-content:center;font-size:1.1rem;overflow:hidden;flex-shrink:0;position:relative;
+  cursor:pointer;
 }
-.thumb img{width:100%;height:100%;object-fit:cover;}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:opacity 0.3s ease;}
+.thumb-nav{
+  position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  display:flex;gap:3px;opacity:0;transition:opacity 0.2s;
+}
+.thumb:hover .thumb-nav{opacity:1;}
+.thumb-dot{
+  width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.5);
+  transition:all 0.2s;
+}
+.thumb-dot.active{background:#fff;width:12px;border-radius:2px;}
 .prod-name{font-weight:500;white-space:nowrap;}
 .prod-cat{font-size:.65rem;color:var(--muted);margin-top:1px;}
 .prod-price{font-family:'Cormorant Garamond',serif;font-size:.97rem;color:var(--deep);font-weight:600;white-space:nowrap;}
@@ -230,7 +254,7 @@ tr:hover td{background:#fdf9f5;}
 
   <div class="product-form" id="add-form">
     <div class="form-title">Новый товар</div>
-    <form method="post" action="/admin/products/add">
+    <form method="post" action="/admin/products/add" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-grid">
         <div class="form-field">
@@ -266,14 +290,10 @@ tr:hover td{background:#fdf9f5;}
           <textarea name="description" rows="2" placeholder="Краткое описание..." required></textarea>
         </div>
         <div class="form-field full">
-          <label>Фото (через запятую)</label>
-          <div class="img-row">
-            <div class="img-preview" id="add-preview">👕</div>
-            <div class="form-field" style="gap:6px">
-              <input type="text" name="images_raw" id="add-img-input" placeholder="👕  или  https://…/1.jpg, https://…/2.jpg" oninput="previewImg(this,'add-preview')">
-              <span class="hint">Первое фото — обложка. Для галереи разделяйте запятой.</span>
-            </div>
-          </div>
+          <label>Фото (минимум 1, максимум 6) *</label>
+          <input type="file" name="images" id="add-img-input" accept="image/*" multiple required onchange="previewMultipleImages(this, 'add-preview-container')">
+          <span class="hint">Выберите от 1 до 6 изображений. Первое фото — обложка.</span>
+          <div id="add-preview-container" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"></div>
         </div>
         <div class="form-field full">
           <label>Размеры в наличии</label>
@@ -329,37 +349,67 @@ tr:hover td{background:#fdf9f5;}
               <div style="font-weight:600;color:var(--muted);min-width:56px;">{{ p.id }}</div>
             </td>
             <td>
-              <div class="thumb">
+              <div class="thumb" data-product-id="{{ p.id }}">
                 {% with first_img=p.images|first %}
                   {% if first_img|is_url %}
-                    <img src="{{ first_img }}" alt="">
+                    <img src="{{ first_img }}" alt="" class="thumb-img">
                   {% else %}
                     {{ first_img }}
                   {% endif %}
                 {% endwith %}
+                <div class="thumb-nav"></div>
               </div>
             </td>
             <td>
               <div class="prod-name">{{ p.name }}</div>
               <div class="prod-cat">{{ p.category }}</div>
             </td>
-            <td><div class="prod-price">{{ p.price|format_price }}</div></td>
             <td>
-              {% if p.discount_percent > 0 %}
-                <span class="badge-tag badge-new">-{{ p.discount_percent }}%</span>
-              {% else %}
-                <span class="badge-tag badge-none">—</span>
-              {% endif %}
+              <div class="prod-price editable-cell"
+                   data-field="price"
+                   data-product-id="{{ p.id }}"
+                   data-value="{{ p.price }}"
+                   onclick="makeEditable(this, 'number')"
+                   title="Кликните для редактирования">{{ p.price|format_price }}</div>
             </td>
-            <td><div class="sizes-list">{{ p.sizes|join:", " }}</div></td>
+            <td>
+              <div class="editable-cell"
+                   data-field="discount_percent"
+                   data-product-id="{{ p.id }}"
+                   data-value="{{ p.discount_percent }}"
+                   onclick="makeEditable(this, 'number')"
+                   title="Кликните для редактирования">
+                {% if p.discount_percent > 0 %}
+                  <span class="badge-tag badge-new">-{{ p.discount_percent }}%</span>
+                {% else %}
+                  <span class="badge-tag badge-none">—</span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <div class="sizes-list editable-cell"
+                   data-field="sizes"
+                   data-product-id="{{ p.id }}"
+                   data-value="{{ p.sizes|join:', ' }}"
+                   onclick="makeEditable(this, 'text')"
+                   title="Кликните для редактирования">{{ p.sizes|join:", " }}</div>
+            </td>
             <td>
               {% if p.badge == 'new' %}<span class="badge-tag badge-new">Новинка</span>
               {% elif p.badge == 'hot' %}<span class="badge-tag badge-hot">🔥 Хит</span>
               {% else %}<span class="badge-tag badge-none">—</span>{% endif %}
             </td>
             <td>
-              {% if p.in_stock %}<span class="in-stock-badge in-stock-yes">В наличии</span>
-              {% else %}<span class="in-stock-badge in-stock-no">Нет</span>{% endif %}
+              <div class="editable-cell"
+                   data-field="in_stock"
+                   data-product-id="{{ p.id }}"
+                   data-value="{{ p.in_stock|lower }}"
+                   onclick="toggleStock(this)"
+                   style="cursor:pointer;"
+                   title="Кликните для изменения">
+                {% if p.in_stock %}<span class="in-stock-badge in-stock-yes">В наличии</span>
+                {% else %}<span class="in-stock-badge in-stock-no">Нет</span>{% endif %}
+              </div>
             </td>
             <td>
               <div class="tbl-actions">
@@ -385,7 +435,7 @@ tr:hover td{background:#fdf9f5;}
   <div class="modal-box">
     <button class="modal-close-btn" onclick="closeEdit()">✕</button>
     <div class="form-title">Редактировать товар</div>
-    <form method="post" id="edit-form">
+    <form method="post" id="edit-form" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-grid">
         <div class="form-field">
@@ -417,13 +467,14 @@ tr:hover td{background:#fdf9f5;}
           <textarea name="description" id="e-desc" rows="2" required></textarea>
         </div>
         <div class="form-field full">
-          <label>Фото (через запятую)</label>
-          <div class="img-row">
-            <div class="img-preview" id="edit-preview">👕</div>
-            <div class="form-field" style="gap:6px">
-              <input type="text" name="images_raw" id="e-img" placeholder="👕  или  https://…/1.jpg" oninput="previewImg(this,'edit-preview')">
-            </div>
-          </div>
+          <label>Текущие фото</label>
+          <div id="current-images-container" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;"></div>
+        </div>
+        <div class="form-field full">
+          <label>Загрузить новые фото (минимум 1, максимум 6)</label>
+          <input type="file" name="images" id="edit-img-input" accept="image/*" multiple onchange="previewMultipleImages(this, 'edit-preview-container')">
+          <span class="hint">Если загрузите новые фото, старые будут заменены. От 1 до 6 изображений.</span>
+          <div id="edit-preview-container" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"></div>
         </div>
         <div class="form-field full">
           <label>Размеры в наличии</label>
@@ -466,13 +517,35 @@ function toggleForm(){
   if(f.classList.contains('open')) f.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function previewImg(input, previewId){
-  const first=(input.value||'').split(',')[0].trim();
-  const el=document.getElementById(previewId);
-  if(!first){el.innerHTML='👕';return;}
-  if(first.startsWith('http')||first.startsWith('/'))
-    el.innerHTML=`<img src="${first}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='❌'">`;
-  else el.innerHTML=first;
+function previewMultipleImages(input, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  const files = input.files;
+  if (!files || files.length === 0) return;
+
+  if (files.length > 6) {
+    alert('Максимум 6 изображений');
+    input.value = '';
+    return;
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const imgDiv = document.createElement('div');
+      imgDiv.style.cssText = 'width:80px;height:80px;border:1px solid var(--border);position:relative;';
+      imgDiv.innerHTML = `
+        <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;top:2px;right:2px;background:var(--crimson);color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:3px;">${i+1}</div>
+      `;
+      container.appendChild(imgDiv);
+    };
+
+    reader.readAsDataURL(file);
+  }
 }
 
 function openEdit(id){
@@ -486,13 +559,32 @@ function openEdit(id){
   document.getElementById('e-discount').value=p.discount_percent||0;
   document.getElementById('e-badge').value=p.badge||'';
   document.getElementById('e-desc').value=p.description||'';
-  const imgs=Array.isArray(p.images)?p.images:['👕'];
-  document.getElementById('e-img').value=imgs.join(', ');
-  previewImg(document.getElementById('e-img'),'edit-preview');
-  
+
+  // Показываем текущие изображения
+  const currentImagesContainer = document.getElementById('current-images-container');
+  currentImagesContainer.innerHTML = '';
+  const imgs = Array.isArray(p.images) ? p.images : [];
+  if (imgs.length > 0 && imgs[0] !== '👕') {
+    imgs.forEach((imgUrl, idx) => {
+      const imgDiv = document.createElement('div');
+      imgDiv.style.cssText = 'width:80px;height:80px;border:1px solid var(--border);position:relative;';
+      imgDiv.innerHTML = `
+        <img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;top:2px;right:2px;background:var(--deep);color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:3px;">${idx+1}</div>
+      `;
+      currentImagesContainer.appendChild(imgDiv);
+    });
+  } else {
+    currentImagesContainer.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">Нет изображений</div>';
+  }
+
+  // Очищаем preview новых изображений
+  document.getElementById('edit-preview-container').innerHTML = '';
+  document.getElementById('edit-img-input').value = '';
+
   // Get preset sizes from Django context
   const presetSizes = new Set({{ sizes_all_json|safe }});
-  
+
   document.querySelectorAll('.e-size-cb').forEach(cb=>{
     cb.checked=Array.isArray(p.sizes)&&p.sizes.includes(cb.value);
   });
@@ -506,6 +598,213 @@ function openEdit(id){
 function closeEdit(){
   document.getElementById('edit-modal').classList.remove('open');
   document.body.style.overflow='';
+}
+
+// Переключение изображений при наведении на миниатюру
+document.addEventListener('DOMContentLoaded', function() {
+  const thumbs = document.querySelectorAll('.thumb[data-product-id]');
+
+  thumbs.forEach(thumb => {
+    const productId = parseInt(thumb.dataset.productId);
+    const product = PRODUCTS_DATA.find(p => p.id === productId);
+
+    if (!product || !Array.isArray(product.images) || product.images.length <= 1 || product.images[0] === '👕') {
+      return;
+    }
+
+    const validImages = product.images.filter(img => img && img !== '👕');
+    if (validImages.length <= 1) return;
+
+    const imgEl = thumb.querySelector('.thumb-img');
+    const navEl = thumb.querySelector('.thumb-nav');
+    let currentIndex = 0;
+    let hoverInterval = null;
+
+    // Создаем индикаторы
+    validImages.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'thumb-dot' + (idx === 0 ? ' active' : '');
+      navEl.appendChild(dot);
+    });
+
+    const dots = navEl.querySelectorAll('.thumb-dot');
+
+    function updateImage(index) {
+      currentIndex = index;
+      imgEl.src = validImages[index];
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    // При наведении начинаем автоматическое переключение
+    thumb.addEventListener('mouseenter', function() {
+      hoverInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % validImages.length;
+        updateImage(currentIndex);
+      }, 800);
+    });
+
+    // При уходе курсора останавливаем и возвращаем первое фото
+    thumb.addEventListener('mouseleave', function() {
+      if (hoverInterval) {
+        clearInterval(hoverInterval);
+        hoverInterval = null;
+      }
+      updateImage(0);
+    });
+  });
+});
+
+// ─── Быстрое редактирование ───
+
+function getCsrfToken() {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'csrftoken') return value;
+  }
+  return '';
+}
+
+function showSaveIndicator(message) {
+  const indicator = document.createElement('div');
+  indicator.className = 'quick-save-indicator';
+  indicator.textContent = message;
+  document.body.appendChild(indicator);
+  setTimeout(() => indicator.remove(), 2000);
+}
+
+async function quickUpdate(productId, field, value) {
+  const url = `/admin/products/${productId}/quick-update`;
+  const payload = { [field]: value };
+
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCsrfToken(),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // Обновляем PRODUCTS_DATA
+      const productIndex = PRODUCTS_DATA.findIndex(p => p.id === productId);
+      if (productIndex !== -1) {
+        PRODUCTS_DATA[productIndex][field] = data[field];
+      }
+      showSaveIndicator('✓ Сохранено');
+      return true;
+    } else {
+      const error = await response.json();
+      alert('Ошибка: ' + (error.error || 'Не удалось сохранить'));
+      return false;
+    }
+  } catch (err) {
+    alert('Ошибка сети: ' + err.message);
+    return false;
+  }
+}
+
+function makeEditable(cell, inputType) {
+  if (cell.classList.contains('editing')) return;
+
+  const productId = parseInt(cell.dataset.productId);
+  const field = cell.dataset.field;
+  const originalValue = cell.dataset.value;
+  const originalHTML = cell.innerHTML;
+
+  cell.classList.add('editing');
+
+  const input = document.createElement('input');
+  input.type = inputType;
+  input.value = originalValue;
+  input.style.width = '100%';
+
+  cell.innerHTML = '';
+  cell.appendChild(input);
+  input.focus();
+  input.select();
+
+  async function saveValue() {
+    let newValue = input.value.trim();
+
+    // Валидация и преобразование
+    if (field === 'price' || field === 'discount_percent') {
+      newValue = parseInt(newValue);
+      if (isNaN(newValue) || newValue < 0) {
+        alert('Введите корректное число');
+        input.focus();
+        return;
+      }
+      if (field === 'discount_percent' && newValue > 100) {
+        alert('Скидка не может быть больше 100%');
+        input.focus();
+        return;
+      }
+    } else if (field === 'sizes') {
+      newValue = newValue.split(',').map(s => s.trim()).filter(s => s);
+    }
+
+    const success = await quickUpdate(productId, field, newValue);
+
+    if (success) {
+      cell.classList.remove('editing');
+      cell.dataset.value = field === 'sizes' ? newValue.join(', ') : newValue;
+
+      // Обновляем отображение
+      if (field === 'price') {
+        cell.innerHTML = `<div class="prod-price">${newValue.toLocaleString('ru-RU')} сум</div>`;
+      } else if (field === 'discount_percent') {
+        if (newValue > 0) {
+          cell.innerHTML = `<span class="badge-tag badge-new">-${newValue}%</span>`;
+        } else {
+          cell.innerHTML = `<span class="badge-tag badge-none">—</span>`;
+        }
+      } else if (field === 'sizes') {
+        cell.textContent = newValue.join(', ');
+      }
+    } else {
+      cell.classList.remove('editing');
+      cell.innerHTML = originalHTML;
+    }
+  }
+
+  function cancel() {
+    cell.classList.remove('editing');
+    cell.innerHTML = originalHTML;
+  }
+
+  input.addEventListener('blur', saveValue);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveValue();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancel();
+    }
+  });
+}
+
+function toggleStock(cell) {
+  const productId = parseInt(cell.dataset.productId);
+  const currentStock = cell.dataset.value === 'true';
+  const newStock = !currentStock;
+
+  quickUpdate(productId, 'in_stock', newStock).then(success => {
+    if (success) {
+      cell.dataset.value = newStock;
+      if (newStock) {
+        cell.innerHTML = '<span class="in-stock-badge in-stock-yes">В наличии</span>';
+      } else {
+        cell.innerHTML = '<span class="in-stock-badge in-stock-no">Нет</span>';
+      }
+    }
+  });
 }
 </script>
 </body>

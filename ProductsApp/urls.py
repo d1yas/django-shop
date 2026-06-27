@@ -16,6 +16,7 @@ from .views import (
     AdminProductCreateView,
     AdminProductUpdateView,
     AdminProductDeleteView,
+    AdminProductQuickUpdateView,
     SendOrderAPIView,
 )
 
@@ -42,4 +43,5 @@ urlpatterns = [
     path('admin/products/add',         AdminProductCreateView.as_view(), name='admin_product_add'),
     path('admin/products/<int:pk>/edit',   AdminProductUpdateView.as_view(), name='admin_product_edit'),
     path('admin/products/<int:pk>/delete', AdminProductDeleteView.as_view(), name='admin_product_delete'),
+    path('admin/products/<int:pk>/quick-update', AdminProductQuickUpdateView.as_view(), name='admin_product_quick_update'),
 ]

@@ -1,5 +1,6 @@
 import json
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class Product(models.Model):
@@ -17,9 +18,6 @@ class Product(models.Model):
     badge            = models.CharField('Значок', max_length=10, choices=BADGE_CHOICES, blank=True, default='')
     in_stock         = models.BooleanField('В наличии', default=True)
 
-    # SQLite не поддерживает ArrayField — храним как JSON-строку
-    # Пример значения в БД: '["https://…/1.jpg", "https://…/2.jpg"]'
-    _images = models.TextField('Фото (JSON)', db_column='images', blank=True, default='[]')
     _sizes  = models.TextField('Размеры (JSON)', db_column='sizes', blank=True, default='[]')
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -29,14 +27,8 @@ class Product(models.Model):
 
     @property
     def images(self) -> list[str]:
-        try:
-            return json.loads(self._images) or ['👕']
-        except (ValueError, TypeError):
-            return ['👕']
-
-    @images.setter
-    def images(self, value: list[str]):
-        self._images = json.dumps(value, ensure_ascii=False)
+        """Возвращает список URL изображений из связанных ProductImage"""
+        return [img.image.url for img in self.product_images.all().order_by('order')]
 
     @property
     def sizes(self) -> list[str]:
@@ -56,3 +48,38 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ProductImage(models.Model):
+    """
+    Модель для хранения изображений товара.
+    Каждый товар может иметь от 1 до 6 изображений.
+    """
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='product_images',
+        verbose_name='Товар'
+    )
+    image = models.ImageField(
+        upload_to='products/%Y/%m/%d/',
+        verbose_name='Изображение'
+    )
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='Порядок'
+    )
+
+    class Meta:
+        verbose_name = 'Изображение товара'
+        verbose_name_plural = 'Изображения товаров'
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.product.name} - Изображение {self.order}"
+
+    def delete(self, *args, **kwargs):
+        # Удаляем файл изображения с диска при удалении записи
+        if self.image:
+            self.image.delete(save=False)
+        super().delete(*args, **kwargs)

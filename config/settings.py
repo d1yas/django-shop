@@ -129,6 +129,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'ProductsApp' / 'static']
+
+# Media files (uploaded images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 ADMIN_USERNAME = 'data_n0thing'
 # Telegram admin username used for prefilled order messages (without @)
 ADMIN_TG_USERNAME = ADMIN_USERNAME.lstrip('@') if 'ADMIN_USERNAME' in globals() else ''

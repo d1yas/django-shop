@@ -260,6 +260,23 @@ class AdminProductCreateView(APIView):
 
     def post(self, request):
         data = self._parse_form(request)
+
+        # Получаем файлы изображений (множественные)
+        images = request.FILES.getlist('images')
+
+        # Валидация количества изображений
+        if not images or len(images) < 1:
+            if self._is_browser(request):
+                return redirect('admin_panel')
+            return Response({'error': 'Необходимо загрузить минимум 1 изображение'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(images) > 6:
+            if self._is_browser(request):
+                return redirect('admin_panel')
+            return Response({'error': 'Максимум 6 изображений'}, status=status.HTTP_400_BAD_REQUEST)
+
+        data['images'] = images
+
         serializer = ProductWriteSerializer(data=data)
 
         if serializer.is_valid():
@@ -345,6 +362,20 @@ class AdminProductUpdateView(APIView):
     def post(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
         data = AdminProductCreateView._parse_form(request)
+
+        # Получаем файлы изображений (множественные)
+        images = request.FILES.getlist('images')
+
+        # Если загружены новые изображения, добавляем их в data
+        if images:
+            # Валидация количества изображений
+            if len(images) > 6:
+                if AdminProductCreateView._is_browser(request):
+                    return redirect('admin_panel')
+                return Response({'error': 'Максимум 6 изображений'}, status=status.HTTP_400_BAD_REQUEST)
+
+            data['images'] = images
+
         serializer = ProductWriteSerializer(product, data=data, partial=True)
 
         if serializer.is_valid():
@@ -374,3 +405,47 @@ class AdminProductDeleteView(APIView):
 
     def delete(self, request, pk):
         return self.post(request, pk)
+
+
+@method_decorator(login_required(login_url='/admin/login'), name='dispatch')
+class AdminProductQuickUpdateView(APIView):
+    """
+    PATCH /admin/products/<id>/quick-update
+    Быстрое обновление статуса, цены, размеров и наличия товара
+    Принимает JSON: { price?, in_stock?, sizes?, discount_percent? }
+    """
+
+    def patch(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+
+        # Обновляем только переданные поля
+        if 'price' in request.data:
+            try:
+                product.price = int(request.data['price'])
+            except (ValueError, TypeError):
+                return Response({'error': 'Неверный формат цены'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'discount_percent' in request.data:
+            try:
+                discount = int(request.data['discount_percent'])
+                if 0 <= discount <= 100:
+                    product.discount_percent = discount
+                else:
+                    return Response({'error': 'Скидка должна быть от 0 до 100'}, status=status.HTTP_400_BAD_REQUEST)
+            except (ValueError, TypeError):
+                return Response({'error': 'Неверный формат скидки'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'in_stock' in request.data:
+            product.in_stock = bool(request.data['in_stock'])
+
+        if 'sizes' in request.data:
+            sizes = request.data['sizes']
+            if isinstance(sizes, list):
+                product.sizes = sizes
+            else:
+                return Response({'error': 'Размеры должны быть массивом'}, status=status.HTTP_400_BAD_REQUEST)
+
+        product.save()
+
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)

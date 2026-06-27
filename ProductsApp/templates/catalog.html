@@ -312,6 +312,28 @@
             color: transparent;
         }
 
+        .product-image-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .product-image-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: background 0.3s;
+        }
+
+        .product-image-indicator.active {
+            background: rgba(255, 255, 255, 1);
+        }
+
         .product-badge {
             position: absolute;
             top: 10px;
@@ -450,10 +472,65 @@
             font-size: 1rem;
             text-transform: uppercase;
             padding: 24px;
+            position: relative;
         }
 
         .modal-image.has-photo {
             color: transparent;
+        }
+
+        .modal-image-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+
+        .modal-image-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-image-nav.prev {
+            left: 10px;
+        }
+
+        .modal-image-nav.next {
+            right: 10px;
+        }
+
+        .modal-image-thumbnails {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .modal-image-thumbnail {
+            width: 50px;
+            height: 50px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .modal-image-thumbnail.active {
+            border-color: rgba(255, 255, 255, 1);
         }
 
         .modal-body {
@@ -1300,29 +1377,40 @@
             emptyState.style.display = 'none';
 
             grid.innerHTML = products.map(product => {
-                const image = Array.isArray(product.images) ? product.images[0] : product.images;
-                const hasPhoto = image && (typeof image === 'string') && (image.startsWith('http') || image.startsWith('/'));
-                const imageStyle = hasPhoto ? `background-image:url('${image}');` : '';
-                
+                const images = Array.isArray(product.images) && product.images.length > 0 ? product.images : ['👕'];
+                const hasPhoto = images[0] && (typeof images[0] === 'string') && (images[0].startsWith('http') || images[0].startsWith('/'));
+                const imageStyle = hasPhoto ? `background-image:url('${images[0]}');` : '';
+
                 // Calculate discounted price
                 const hasDiscount = product.discount_percent && product.discount_percent > 0;
                 const originalPrice = product.price;
-                const discountedPrice = hasDiscount 
+                const discountedPrice = hasDiscount
                     ? Math.round(product.price * (1 - product.discount_percent / 100))
                     : product.price;
-                
+
+                // Индикаторы для множественных фото
+                let indicators = '';
+                if (images.length > 1) {
+                    indicators = '<div class="product-image-indicators">';
+                    for (let i = 0; i < images.length; i++) {
+                        indicators += `<div class="product-image-indicator ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
+                    }
+                    indicators += '</div>';
+                }
+
                 return `
-                <div class="product-card">
-                    <div class="product-image ${hasPhoto ? 'has-photo' : ''}" style="${imageStyle}">
+                <div class="product-card" data-product-id="${product.id}" data-images='${JSON.stringify(images)}'>
+                    <div class="product-image ${hasPhoto ? 'has-photo' : ''}" style="${imageStyle}" data-current-index="0">
                         ${product.badge ? `<span class="product-badge">${product.badge === 'new' ? 'Новинка' : 'Хит'}</span>` : ''}
                         ${hasDiscount ? `<span class="product-badge discount" style="top: ${product.badge ? '45px' : '10px'};">-${product.discount_percent}%</span>` : ''}
                         ${hasPhoto ? '' : 'Фото товара'}
+                        ${indicators}
                     </div>
                     <div class="product-info">
                         <div class="product-category">${product.category}</div>
                         <div class="product-name">${product.name}</div>
                         <div class="product-price">
-                            ${hasDiscount 
+                            ${hasDiscount
                                 ? `<span style="text-decoration: line-through; color: var(--muted); font-size: 0.9rem; margin-right: 8px;">${originalPrice.toLocaleString('ru-RU')}</span>${discountedPrice.toLocaleString('ru-RU')} сум`
                                 : `${product.price.toLocaleString('ru-RU')} сум`
                             }
@@ -1337,33 +1425,76 @@
                 </div>
             `;
             }).join('');
+
+            // После рендеринга инициализируем переключение изображений
+            initImageSwitching();
         }
 
         let PRODUCT_DETAIL = null;
         let SELECTED_SIZE = null;
+        let CURRENT_MODAL_IMAGE_INDEX = 0;
+        let MODAL_IMAGES = [];
 
         function viewProductDetail(productId) {
             PRODUCT_DETAIL = allProducts.find(item => item.id === productId);
             if (!PRODUCT_DETAIL) return;
 
             SELECTED_SIZE = null;
-            const image = Array.isArray(PRODUCT_DETAIL.images) ? PRODUCT_DETAIL.images[0] : PRODUCT_DETAIL.images;
-            const hasPhoto = image && (typeof image === 'string') && (image.startsWith('http') || image.startsWith('/'));
+            MODAL_IMAGES = Array.isArray(PRODUCT_DETAIL.images) && PRODUCT_DETAIL.images.length > 0 ? PRODUCT_DETAIL.images : ['👕'];
+            CURRENT_MODAL_IMAGE_INDEX = 0;
+
+            const hasPhoto = MODAL_IMAGES[0] && (typeof MODAL_IMAGES[0] === 'string') && (MODAL_IMAGES[0].startsWith('http') || MODAL_IMAGES[0].startsWith('/'));
             const imageElement = document.getElementById('modal-image');
-            imageElement.style.backgroundImage = hasPhoto ? `url('${image}')` : '';
+
+            // Очищаем старое содержимое
+            imageElement.innerHTML = '';
+            imageElement.style.backgroundImage = hasPhoto ? `url('${MODAL_IMAGES[0]}')` : '';
             imageElement.classList.toggle('has-photo', hasPhoto);
-            imageElement.textContent = hasPhoto ? '' : 'Фото товара';
+            if (!hasPhoto) {
+                imageElement.textContent = 'Фото товара';
+            }
+
+            // Добавляем навигацию и миниатюры если несколько фото
+            if (MODAL_IMAGES.length > 1 && hasPhoto) {
+                // Кнопки навигации
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'modal-image-nav prev';
+                prevBtn.innerHTML = '‹';
+                prevBtn.onclick = () => changeModalImage(-1);
+
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'modal-image-nav next';
+                nextBtn.innerHTML = '›';
+                nextBtn.onclick = () => changeModalImage(1);
+
+                imageElement.appendChild(prevBtn);
+                imageElement.appendChild(nextBtn);
+
+                // Миниатюры
+                const thumbnailsContainer = document.createElement('div');
+                thumbnailsContainer.className = 'modal-image-thumbnails';
+
+                MODAL_IMAGES.forEach((img, idx) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = `modal-image-thumbnail ${idx === 0 ? 'active' : ''}`;
+                    thumb.style.backgroundImage = `url('${img}')`;
+                    thumb.onclick = () => setModalImage(idx);
+                    thumbnailsContainer.appendChild(thumb);
+                });
+
+                imageElement.appendChild(thumbnailsContainer);
+            }
 
             document.getElementById('modal-name').textContent = PRODUCT_DETAIL.name;
             document.getElementById('modal-category').textContent = PRODUCT_DETAIL.category;
-            
+
             // Handle discount in modal
             const hasDiscount = PRODUCT_DETAIL.discount_percent && PRODUCT_DETAIL.discount_percent > 0;
             const originalPrice = PRODUCT_DETAIL.price;
-            const discountedPrice = hasDiscount 
+            const discountedPrice = hasDiscount
                 ? Math.round(PRODUCT_DETAIL.price * (1 - PRODUCT_DETAIL.discount_percent / 100))
                 : PRODUCT_DETAIL.price;
-            
+
             const priceElement = document.getElementById('modal-price');
             if (hasDiscount) {
                 priceElement.innerHTML = `
@@ -1374,7 +1505,7 @@
             } else {
                 priceElement.textContent = `${PRODUCT_DETAIL.price.toLocaleString('ru-RU')} сум`;
             }
-            
+
             document.getElementById('modal-desc').textContent = PRODUCT_DETAIL.description || 'Описание товара пока отсутствует.';
             document.getElementById('modal-stock').textContent = PRODUCT_DETAIL.in_stock ? 'В наличии' : 'Нет в наличии';
             document.getElementById('modal-stock').className = PRODUCT_DETAIL.in_stock ? 'product-stock in-stock' : 'product-stock out-of-stock';
@@ -1398,6 +1529,23 @@
             document.getElementById('order-button').disabled = !PRODUCT_DETAIL.in_stock || sizes.length === 0;
             document.getElementById('product-modal').classList.add('open');
             document.body.style.overflow = 'hidden';
+        }
+
+        function changeModalImage(direction) {
+            CURRENT_MODAL_IMAGE_INDEX = (CURRENT_MODAL_IMAGE_INDEX + direction + MODAL_IMAGES.length) % MODAL_IMAGES.length;
+            setModalImage(CURRENT_MODAL_IMAGE_INDEX);
+        }
+
+        function setModalImage(index) {
+            CURRENT_MODAL_IMAGE_INDEX = index;
+            const imageElement = document.getElementById('modal-image');
+            imageElement.style.backgroundImage = `url('${MODAL_IMAGES[index]}')`;
+
+            // Обновляем активную миниатюру
+            const thumbnails = imageElement.querySelectorAll('.modal-image-thumbnail');
+            thumbnails.forEach((thumb, idx) => {
+                thumb.classList.toggle('active', idx === index);
+            });
         }
 
         function selectModalSize(size, button) {
@@ -1461,12 +1609,109 @@
             const filters = document.getElementById('filtersSidebar');
             const closeBtn = filters.querySelector('.filter-close-btn');
             const isActive = filters.classList.toggle('active');
-            
+
             if (window.innerWidth <= 768) {
                 closeBtn.style.display = isActive ? 'block' : 'none';
                 document.body.style.overflow = isActive ? 'hidden' : '';
             }
         }
+
+        // Автоматическое переключение изображений
+        let imageIntervals = new Map();
+        let isMobile = window.innerWidth <= 768;
+
+        function initImageSwitching() {
+            // Очищаем старые интервалы
+            imageIntervals.forEach(interval => clearInterval(interval));
+            imageIntervals.clear();
+
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(card => {
+                const images = JSON.parse(card.getAttribute('data-images') || '[]');
+                if (images.length <= 1 || images[0] === '👕') return;
+
+                const imageDiv = card.querySelector('.product-image');
+                const indicators = card.querySelectorAll('.product-image-indicator');
+
+                // Функция переключения изображения
+                function switchImage(newIndex) {
+                    const currentIndex = parseInt(imageDiv.getAttribute('data-current-index') || '0');
+                    if (newIndex === currentIndex) return;
+
+                    imageDiv.style.backgroundImage = `url('${images[newIndex]}')`;
+                    imageDiv.setAttribute('data-current-index', newIndex);
+
+                    // Обновляем индикаторы
+                    indicators.forEach((ind, idx) => {
+                        ind.classList.toggle('active', idx === newIndex);
+                    });
+                }
+
+                // Десктоп: переключение при наведении мыши
+                if (!isMobile) {
+                    let hoverInterval = null;
+                    let currentHoverIndex = 0;
+
+                    card.addEventListener('mouseenter', () => {
+                        currentHoverIndex = 0;
+                        hoverInterval = setInterval(() => {
+                            currentHoverIndex = (currentHoverIndex + 1) % images.length;
+                            switchImage(currentHoverIndex);
+                        }, 800); // Переключение каждые 800ms
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        if (hoverInterval) {
+                            clearInterval(hoverInterval);
+                            hoverInterval = null;
+                        }
+                        // Возвращаемся к первому изображению
+                        switchImage(0);
+                    });
+                }
+
+                // Мобайл: автоматическое переключение для видимых товаров
+                if (isMobile) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                // Товар виден - запускаем автоматическое переключение
+                                let autoIndex = 0;
+                                const autoInterval = setInterval(() => {
+                                    autoIndex = (autoIndex + 1) % images.length;
+                                    switchImage(autoIndex);
+                                }, 2000); // Переключение каждые 2 секунды
+
+                                imageIntervals.set(card, autoInterval);
+                            } else {
+                                // Товар не виден - останавливаем переключение
+                                const interval = imageIntervals.get(card);
+                                if (interval) {
+                                    clearInterval(interval);
+                                    imageIntervals.delete(card);
+                                }
+                                // Возвращаемся к первому изображению
+                                switchImage(0);
+                            }
+                        });
+                    }, {
+                        threshold: 0.5 // Товар должен быть виден минимум на 50%
+                    });
+
+                    observer.observe(card);
+                }
+            });
+        }
+
+        // Отслеживание изменения размера окна
+        window.addEventListener('resize', () => {
+            const newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile !== isMobile) {
+                isMobile = newIsMobile;
+                initImageSwitching();
+            }
+        });
 
         // Загрузить товары при загрузке страницы
         loadProducts();
