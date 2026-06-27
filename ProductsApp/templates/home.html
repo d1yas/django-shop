@@ -2,814 +2,577 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="theme-color" content="#780000">
-    <title>khikmatillaev's - Эксклюзивная одежда</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>khikmatillaev's — Premium Clothing</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --burgundy:#8B1538;--deep-burgundy:#5A0F24;--wine:#6B1129;--maroon:#9B1B3A;
+            --cream:#FFF8F0;--milk:#FFFBF7;--beige:#F5E6D3;--rose:#FFE4E9;--rose2:#FFD1DC;
+            --white:#ffffff;--g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+            --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;--g900:#0f172a;
+            --gold:#D4AF37;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',sans-serif;background:var(--white);color:var(--g800);overflow-x:hidden}
+
+        /* NAVBAR */
+        .nav{position:fixed;top:0;left:0;right:0;z-index:1000;transition:all .3s ease;padding:1.25rem 0}
+        .nav.scrolled{background:rgba(255,251,247,.97);backdrop-filter:blur(20px);box-shadow:0 1px 30px rgba(139,21,56,.08);padding:.8rem 0}
+        .nav-inner{max-width:1320px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:1.6rem;font-weight:900;letter-spacing:-.5px;text-decoration:none;font-family:'Playfair Display',serif;font-style:italic}
+        .logo{color:var(--deep-burgundy)}
+        .nav:not(.scrolled) .logo{color:var(--white)}
+        .nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+        .nav-links a{text-decoration:none;font-weight:500;font-size:.95rem;transition:color .3s;position:relative}
+        .nav:not(.scrolled) .nav-links a{color:rgba(255,255,255,.85)}
+        .nav:not(.scrolled) .nav-links a:hover{color:var(--white)}
+        .nav.scrolled .nav-links a{color:var(--g600)}
+        .nav.scrolled .nav-links a:hover{color:var(--burgundy)}
+        .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--burgundy);transition:width .3s}
+        .nav-links a:hover::after{width:100%}
+        .nav-cta{background:var(--burgundy);color:var(--white)!important;padding:.55rem 1.4rem;border-radius:50px;font-weight:600;font-size:.9rem}
+        .nav-cta:hover{background:var(--deep-burgundy);transform:translateY(-1px)}
+        .nav-cta::after{display:none!important}
+        .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none}
+        .burger span{width:24px;height:2px;background:var(--g800);transition:all .3s}
+        .nav:not(.scrolled) .burger span{background:var(--white)}
+
+        /* HERO */
+        .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;
+            background:linear-gradient(135deg,var(--deep-burgundy) 0%,#7B1432 40%,var(--burgundy) 100%)}
+        .hero-shapes{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+        .hero-shapes .shape{position:absolute;border-radius:50%;opacity:.08;background:var(--white)}
+        .hero-shapes .s1{width:600px;height:600px;top:-200px;right:-100px;animation:float 8s ease-in-out infinite}
+        .hero-shapes .s2{width:400px;height:400px;bottom:-100px;left:-100px;animation:float 10s ease-in-out infinite reverse}
+        .hero-shapes .s3{width:200px;height:200px;top:40%;left:30%;animation:float 6s ease-in-out infinite}
+        @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+        .hero-grid{position:absolute;inset:0;background-image:
+            linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+            background-size:60px 60px}
+        .hero-content{position:relative;z-index:2;max-width:1320px;margin:0 auto;padding:8rem 2rem 6rem;width:100%;
+            display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+        .hero-text{color:var(--white)}
+        .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.12);
+            border:1px solid rgba(255,255,255,.2);padding:.4rem 1.2rem;border-radius:50px;font-size:.85rem;
+            font-weight:500;margin-bottom:2rem;backdrop-filter:blur(10px);animation:fadeUp .8s ease both}
+        .hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:900;
+            line-height:1.05;margin-bottom:1.5rem;animation:fadeUp .8s ease .15s both}
+        .hero-title span{color:var(--rose2)}
+        .hero-desc{font-size:1.15rem;color:rgba(255,255,255,.75);max-width:500px;line-height:1.7;
+            margin-bottom:2.5rem;animation:fadeUp .8s ease .3s both}
+        .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .8s ease .45s both}
+        .btn{padding:.9rem 2rem;border-radius:50px;text-decoration:none;font-weight:600;font-size:.95rem;
+            transition:all .3s ease;display:inline-flex;align-items:center;gap:.5rem;border:none;cursor:pointer}
+        .btn-w{background:var(--white);color:var(--deep-burgundy)}
+        .btn-w:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+        .btn-outline-w{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,.3)}
+        .btn-outline-w:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
+        .hero-visual{display:flex;justify-content:center;align-items:center;animation:fadeUp .8s ease .3s both}
+        .hero-card{background:rgba(255,255,255,.1);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);
+            border-radius:24px;padding:2rem;width:100%;max-width:380px}
+        .hero-card-title{color:var(--white);font-size:1rem;font-weight:600;margin-bottom:1.5rem;
+            display:flex;align-items:center;gap:.5rem}
+        .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .hero-stat{background:rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;text-align:center}
+        .hero-stat-num{font-size:2rem;font-weight:800;color:var(--white)}
+        .hero-stat-label{font-size:.8rem;color:rgba(255,255,255,.6);margin-top:.3rem}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+        /* MARQUEE */
+        .marquee{background:var(--deep-burgundy);padding:.8rem 0;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.1)}
+        .marquee-track{display:flex;gap:3rem;animation:scroll 20s linear infinite;white-space:nowrap}
+        .marquee-item{color:rgba(255,255,255,.5);font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:.5rem}
+        .marquee-item i{color:var(--burgundy)}
+        @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+        /* SECTION COMMON */
+        .section{padding:6rem 2rem}
+        .container{max-width:1320px;margin:0 auto}
+        .sec-head{text-align:center;margin-bottom:4rem}
+        .sec-label{display:inline-block;color:var(--burgundy);font-size:.85rem;font-weight:700;text-transform:uppercase;
+            letter-spacing:2px;margin-bottom:.75rem}
+        .sec-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--g900)}
+        .sec-desc{color:var(--g500);font-size:1.05rem;margin-top:.75rem;max-width:550px;margin-left:auto;margin-right:auto}
+
+        /* CATEGORIES */
+        .cat-section{background:var(--g50)}
+        .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+        .cat-card{background:var(--white);border-radius:20px;overflow:hidden;transition:all .4s ease;
+            cursor:pointer;border:1px solid var(--g200);text-decoration:none;color:inherit;position:relative}
+        .cat-card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(139,21,56,.1);border-color:var(--burgundy)}
+        .cat-card-top{height:160px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;
+            background:linear-gradient(135deg,var(--rose),var(--rose2));position:relative;overflow:hidden}
+        .cat-card-top::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(139,21,56,.1));pointer-events:none}
+        .cat-card-body{padding:1.5rem}
+        .cat-card-name{font-size:1.25rem;font-weight:700;color:var(--g900);margin-bottom:.35rem}
+        .cat-card-desc{font-size:.9rem;color:var(--g500);line-height:1.5}
+        .cat-card-count{display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;font-size:.8rem;
+            color:var(--burgundy);font-weight:600}
+        .cat-card-arrow{position:absolute;top:1.5rem;right:1.5rem;width:36px;height:36px;border-radius:50%;
+            background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--burgundy);
+            transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .cat-card:hover .cat-card-arrow{background:var(--burgundy);color:var(--white)}
+
+        /* FEATURED */
+        .feat-section{background:var(--white)}
+        .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+        .prod-card{background:var(--white);border-radius:16px;overflow:hidden;transition:all .3s;cursor:pointer;
+            border:1px solid var(--g200);text-decoration:none;color:inherit}
+        .prod-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(139,21,56,.1);border-color:var(--burgundy)}
+        .prod-img{width:100%;height:280px;background:linear-gradient(135deg,var(--rose),var(--g100));
+            display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden}
+        .prod-img img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity .4s ease}
+        .prod-img img.active{opacity:1}
+        .prod-img-hover-zones{position:absolute;inset:0;display:none;z-index:3;pointer-events:none}
+        .prod-img[data-has-slider="true"] .prod-img-hover-zones{display:flex}
+        .hover-zone{flex:1;pointer-events:all;cursor:pointer}
+        .hover-zone-left{background:linear-gradient(to right,rgba(0,0,0,.1),transparent)}
+        .hover-zone-right{background:linear-gradient(to left,rgba(0,0,0,.1),transparent)}
+        .hover-zone:hover{background:rgba(0,0,0,.15)}
+        .prod-img-nav{position:absolute;bottom:0;left:0;right:0;display:flex;gap:4px;padding:8px;justify-content:center;
+            background:linear-gradient(to top,rgba(0,0,0,.5),transparent);z-index:2;opacity:0;transition:opacity .3s}
+        .prod-img:hover .prod-img-nav{opacity:1}
+        .prod-img-dot{width:100%;height:3px;background:rgba(255,255,255,.4);border-radius:2px;cursor:pointer;transition:all .3s}
+        .prod-img-dot.active{background:var(--white);height:4px}
+        .prod-img-emoji{font-size:5rem;z-index:1}
+        .prod-badge{position:absolute;top:.75rem;left:.75rem;padding:.3rem .9rem;border-radius:20px;
+            font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;z-index:2}
+        .badge-new{background:var(--burgundy);color:var(--white)}
+        .badge-hot{background:#ef4444;color:var(--white)}
+        .badge-sale{background:#f59e0b;color:var(--white)}
+        .prod-body{padding:1.25rem}
+        .prod-cat{font-size:.75rem;color:var(--burgundy);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}
+        .prod-name{font-size:1.05rem;font-weight:700;color:var(--g900);margin-bottom:.5rem}
+        .prod-price{display:flex;align-items:center;gap:.6rem}
+        .price-now{font-size:1.2rem;font-weight:800;color:var(--deep-burgundy)}
+        .price-old{font-size:.9rem;color:var(--g500);text-decoration:line-through}
+        .prod-sizes{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem}
+        .size-tag{padding:.25rem .5rem;background:var(--g100);border-radius:4px;font-size:.7rem;font-weight:600;color:var(--g600)}
+
+        /* FEATURES */
+        .why-section{background:var(--g50)}
+        .why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem}
+        .why-card{background:var(--white);padding:2rem;border-radius:16px;text-align:center;border:1px solid var(--g200);transition:all .3s}
+        .why-card:hover{transform:translateY(-5px);border-color:var(--burgundy);box-shadow:0 10px 30px rgba(139,21,56,.08)}
+        .why-icon{width:64px;height:64px;border-radius:16px;background:var(--rose);display:flex;align-items:center;
+            justify-content:center;margin:0 auto 1.25rem;font-size:1.5rem;color:var(--burgundy)}
+        .why-title{font-size:1.1rem;font-weight:700;color:var(--g900);margin-bottom:.5rem}
+        .why-desc{font-size:.9rem;color:var(--g500);line-height:1.6}
+
+        /* CTA */
+        .cta{padding:6rem 2rem;background:linear-gradient(135deg,var(--deep-burgundy),var(--burgundy));text-align:center;position:relative;overflow:hidden}
+        .cta::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;border-radius:50%;
+            background:rgba(255,255,255,.05)}
+        .cta-inner{position:relative;z-index:1}
+        .cta-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--white);margin-bottom:1rem}
+        .cta-desc{color:rgba(255,255,255,.75);font-size:1.1rem;margin-bottom:2.5rem;max-width:500px;margin-left:auto;margin-right:auto}
+        .btn-cta{background:var(--white);color:var(--deep-burgundy);padding:1rem 2.5rem;font-size:1.05rem}
+        .btn-cta:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(0,0,0,.25)}
+
+        /* FOOTER */
+        .footer{background:var(--g900);color:var(--white);padding:4rem 2rem 2rem}
+        .footer-grid{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+        .footer-logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;margin-bottom:1rem;color:var(--white);font-style:italic}
+        .footer-about{color:var(--g500);font-size:.9rem;line-height:1.7;margin-bottom:1.5rem}
+        .footer-social{display:flex;gap:.75rem}
+        .footer-social a{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.07);
+            display:flex;align-items:center;justify-content:center;color:var(--g500);transition:all .3s;text-decoration:none}
+        .footer-social a:hover{background:var(--burgundy);color:var(--white)}
+        .footer-col-title{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+            margin-bottom:1.25rem;color:var(--white)}
+        .footer-links{list-style:none;display:flex;flex-direction:column;gap:.75rem}
+        .footer-links a{color:var(--g500);text-decoration:none;font-size:.9rem;transition:color .3s}
+        .footer-links a:hover{color:var(--rose2)}
+        .footer-bottom{max-width:1320px;margin:0 auto;padding-top:2rem;border-top:1px solid rgba(255,255,255,.08);
+            text-align:center}
+        .footer-copy{color:var(--g500);font-size:.85rem}
+
+        /* RESPONSIVE */
+        @media(max-width:968px){
+            .hero-content{grid-template-columns:1fr;text-align:center;padding-top:7rem}
+            .hero-desc{margin-left:auto;margin-right:auto}
+            .hero-actions{justify-content:center}
+            .hero-visual{display:none}
+            .about-content{grid-template-columns:1fr}
+            .footer-grid{grid-template-columns:1fr}
+        }
+        @media(max-width:768px){
+            .nav-links{display:none}
+            .burger{display:flex}
+            .section{padding:4rem 1.5rem}
         }
 
-        :root {
-            --crimson: #AE1F23;
-            --deep: #780000;
-            --gold: #c9a96e;
-            --gold-light: #e8d5b0;
-            --cream: #f9f5ee;
-            --text: #1a0a0a;
-            --muted: #7a5c5c;
-            --border: rgba(174, 31, 35, 0.15);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background: var(--cream);
-            color: var(--text);
-            font-family: 'Jost', sans-serif;
-            line-height: 1.6;
-        }
-
-        /* ── HEADER ── */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(80, 0, 0, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(201, 169, 110, .2);
-            padding: 16px 40px;
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            font-style: italic;
-            color: var(--gold);
-            text-decoration: none;
-            font-weight: 400;
-            letter-spacing: 1px;
-        }
-
-        nav {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-        }
-
-        nav a {
-            color: rgba(232, 213, 176, 0.9);
-            text-decoration: none;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            color: var(--gold);
-        }
-
-        /* ── HERO ── */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: radial-gradient(circle at top, rgba(255, 255, 255, .05), transparent 35%),
-                        linear-gradient(160deg, #3d0000 0%, #780000 50%, #1a0000 100%);
-            color: var(--gold-light);
-            padding: 80px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(201, 169, 110, 0.18), transparent 25%),
-                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08), transparent 20%);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            max-width: 760px;
-            z-index: 1;
-        }
-
-        .hero-content h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(2.4rem, 9vw, 5rem);
-            font-style: italic;
-            color: var(--gold);
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            font-weight: 400;
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero-content p {
-            font-size: 1.15rem;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(232, 213, 176, 0.95);
-            font-weight: 300;
-            max-width: 740px;
-            margin-left: auto;
-            margin-right: auto;
-            animation: fadeInUp 1s ease 0.2s both;
-        }
-
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            animation: fadeInUp 1s ease 0.4s both;
-        }
-
-        .btn-primary {
-            display: inline-block;
-            padding: 16px 50px;
-            background: var(--crimson);
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            border: 2px solid var(--crimson);
-            border-radius: 6px;
-        }
-
-        .btn-primary:hover {
-            background: transparent;
-            color: var(--crimson);
-        }
-
-        .btn-secondary {
-            display: inline-block;
-            padding: 16px 50px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            border: 2px solid rgba(232, 213, 176, 0.35);
-            border-radius: 6px;
-            color: rgba(232, 213, 176, 0.95);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        .hero-features {
-            padding: 70px 40px 40px;
-            background: #fff5ee;
-        }
-
-        .hero-features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(220px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            padding: 28px;
-            background: #fff;
-            border-radius: 18px;
-            border: 1px solid rgba(174, 31, 35, 0.08);
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeInUp 0.6s ease both;
-        }
-
-        .feature-card:nth-child(1) { animation-delay: 0.1s; }
-        .feature-card:nth-child(2) { animation-delay: 0.2s; }
-        .feature-card:nth-child(3) { animation-delay: 0.3s; }
-
-        .feature-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
-        }
-
-        .feature-number {
-            font-size: 0.9rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 14px;
-        }
-
-        .feature-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.4rem;
-            color: var(--deep);
-            margin-bottom: 14px;
-        }
-
-        .feature-text {
-            color: var(--text);
-            line-height: 1.8;
-            font-size: 0.95rem;
-        }
-
-        /* ── SECTIONS ── */
-        section {
-            padding: 100px 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.5rem;
-            font-style: italic;
-            color: var(--deep);
-            margin-bottom: 50px;
-            text-align: center;
-        }
-
-        .section-subtitle {
-            font-size: 1.1rem;
-            color: var(--muted);
-            text-align: center;
-            margin-bottom: 50px;
-            line-height: 1.8;
-        }
-
-        /* ── О НАС ── */
-        #about {
-            background: var(--cream);
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-text h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            color: var(--deep);
-            margin-bottom: 20px;
-            font-style: italic;
-            animation: slideInLeft 0.6s ease both;
-        }
-
-        .about-text p {
-            margin-bottom: 20px;
-            color: var(--text);
-            line-height: 1.8;
-        }
-
-        .about-image {
-            width: 100%;
-            height: 400px;
-            background: linear-gradient(135deg, var(--crimson), var(--gold));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-style: italic;
-            font-size: 1.2rem;
-            animation: slideInRight 0.6s ease both;
-        }
-
-        /* ── FAQ ── */
-        #faq {
-            background: rgba(174, 31, 35, 0.05);
-        }
-
-        .faq-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .faq-item {
-            background: #fff;
-            border-left: 4px solid var(--crimson);
-            padding: 25px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            animation: fadeIn 0.5s ease both;
-        }
-
-        .faq-item:nth-child(1) { animation-delay: 0.1s; }
-        .faq-item:nth-child(2) { animation-delay: 0.2s; }
-        .faq-item:nth-child(3) { animation-delay: 0.3s; }
-        .faq-item:nth-child(4) { animation-delay: 0.4s; }
-
-        .faq-item:hover {
-            box-shadow: 0 4px 15px rgba(174, 31, 35, 0.1);
-        }
-
-        .faq-item h4 {
-            color: var(--deep);
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .faq-item p {
-            color: var(--muted);
-            max-height: 200px;
-            overflow: hidden;
-            transition: max-height 0.3s;
-        }
-
-        .faq-item.active p {
-            max-height: none;
-        }
-
-        /* ── КОНТАКТЫ ── */
-        #contacts {
-            background: var(--cream);
-        }
-
-        .contacts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-
-        .contact-item {
-            text-align: center;
-            animation: fadeInUp 0.6s ease both;
-        }
-
-        .contact-item:nth-child(1) { animation-delay: 0.1s; }
-        .contact-item:nth-child(2) { animation-delay: 0.2s; }
-        .contact-item:nth-child(3) { animation-delay: 0.3s; }
-
-        .contact-item h3 {
-            color: var(--deep);
-            margin-bottom: 15px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.5rem;
-            font-style: italic;
-        }
-
-        .contact-item p {
-            color: var(--muted);
-        }
-
-        .contact-item a {
-            color: var(--crimson);
-            text-decoration: none;
-        }
-
-        .contact-item a:hover {
-            text-decoration: underline;
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            background: var(--deep);
-            color: var(--gold-light);
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid rgba(201, 169, 110, .2);
-        }
-
-        /* ── ANIMATIONS ── */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ── RESPONSIVE ── */
-        
-        /* Tablets */
-        @media (max-width: 1024px) {
-            .hero-features-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-        }
-
-        /* Mobile Landscape & Small Tablets */
-        @media (max-width: 768px) {
-            header {
-                padding: 12px 20px;
-            }
-
-            .header-container {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .logo {
-                font-size: 1.5rem;
-            }
-
-            nav {
-                gap: 12px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            nav a {
-                font-size: 0.85rem;
-                padding: 5px 8px;
-            }
-
-            .hero {
-                padding: 60px 20px;
-                min-height: 80vh;
-            }
-
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-content p {
-                font-size: 1rem;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                padding: 14px 40px;
-                font-size: 0.85rem;
-            }
-
-            .hero-features {
-                padding: 50px 20px 30px;
-            }
-
-            .hero-features-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .feature-card {
-                padding: 20px;
-            }
-
-            section {
-                padding: 60px 20px;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .about-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .about-image {
-                height: 300px;
-            }
-
-            .contacts-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-        }
-
-        /* Mobile Portrait */
-        @media (max-width: 480px) {
-            header {
-                padding: 10px 15px;
-            }
-
-            .logo {
-                font-size: 1.3rem;
-            }
-
-            nav a {
-                font-size: 0.75rem;
-                padding: 4px 6px;
-            }
-
-            .hero {
-                padding: 40px 15px;
-                min-height: 70vh;
-            }
-
-            .hero-content h1 {
-                font-size: 2rem;
-            }
-
-            .hero-content p {
-                font-size: 0.9rem;
-                margin-bottom: 30px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                width: 100%;
-                padding: 12px 30px;
-                text-align: center;
-            }
-
-            .hero-features {
-                padding: 40px 15px 20px;
-            }
-
-            section {
-                padding: 40px 15px;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-                margin-bottom: 30px;
-            }
-
-            .section-subtitle {
-                font-size: 1rem;
-                margin-bottom: 30px;
-            }
-
-            .about-text h3 {
-                font-size: 1.5rem;
-            }
-
-            .about-image {
-                height: 250px;
-            }
-
-            .faq-item {
-                padding: 18px;
-                margin-bottom: 15px;
-            }
-
-            .faq-item h4 {
-                font-size: 1rem;
-            }
-
-            .contact-item h3 {
-                font-size: 1.3rem;
-            }
-
-            footer {
-                padding: 20px;
-                font-size: 0.85rem;
-            }
-        }
-
-        /* Extra Small Phones */
-        @media (max-width: 360px) {
-            .hero-content h1 {
-                font-size: 1.7rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            nav a {
-                font-size: 0.7rem;
-            }
-        }
+        /* SCROLL REVEAL */
+        .reveal{opacity:0;transform:translateY(40px);transition:all .7s ease}
+        .reveal.visible{opacity:1;transform:translateY(0)}
     </style>
 </head>
 <body>
-    <!-- HEADER -->
-    <header>
-        <div class="header-container">
-            <a href="/" class="logo">khikmatillaev's</a>
-            <nav>
-                <a href="#about">О нас</a>
-                <a href="/catalog/">Товары</a>
-                <a href="#faq">FAQ</a>
-                <a href="#contacts">Контакты</a>
-            </nav>
-        </div>
-    </header>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>khikmatillaev's</h1>
-            <p>Эксклюзивная одежда высокого качества</p>
-            <div class="hero-buttons">
-                <a href="/catalog/" class="btn-primary">Смотреть каталог</a>
-                <a href="#about" class="btn-secondary">О нас</a>
-            </div>
-        </div>
-    </section>
+<!-- NAVBAR -->
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a href="/" class="logo">khikmatillaev's</a>
+        <ul class="nav-links">
+            <li><a href="#home">Главная</a></li>
+            <li><a href="#about">О нас</a></li>
+            <li><a href="/catalog/">Каталог</a></li>
+            <li><a href="#why">Преимущества</a></li>
+            <li><a href="/catalog/" class="nav-cta"><i class="fas fa-shopping-bag"></i> Смотреть товары</a></li>
+        </ul>
+        <button class="burger" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
 
-    <section class="hero-features">
-        <div class="hero-features-grid">
-            <div class="feature-card">
-                <div class="feature-number">01</div>
-                <div class="feature-title">Премиальные ткани</div>
-                <div class="feature-text">Каждая модель создаётся из лучших материалов с высокой плотностью и стойким цветом.</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-number">02</div>
-                <div class="feature-title">Индивидуальный стиль</div>
-                <div class="feature-text">Контрастные решения, минимализм и элегантность в одной коллекции.</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-number">03</div>
-                <div class="feature-title">Быстрое оформление</div>
-                <div class="feature-text">Закажите товар в пару кликов и получите готовое сообщение в Telegram.</div>
+<!-- HERO -->
+<section class="hero" id="home">
+    <div class="hero-shapes">
+        <div class="shape s1"></div>
+        <div class="shape s2"></div>
+        <div class="shape s3"></div>
+    </div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-badge"><i class="fas fa-sparkles"></i> Новая коллекция 2026</div>
+            <h1 class="hero-title">Найдите свой стиль с <span>khikmatillaev's</span></h1>
+            <p class="hero-desc">Премиальная одежда высочайшего качества — современный дизайн, доступные цены. Футболки, куртки, штаны и аксессуары.</p>
+            <div class="hero-actions">
+                <a href="/catalog/" class="btn btn-w"><i class="fas fa-shopping-bag"></i> Смотреть каталог</a>
+                <a href="#about" class="btn btn-outline-w"><i class="fas fa-info-circle"></i> О нас</a>
             </div>
         </div>
-    </section>
-
-    <!-- О НАС -->
-    <section id="about">
-        <h2 class="section-title">О нас</h2>
-        <div class="about-grid">
-            <div class="about-text">
-                <h3>Добро пожаловать</h3>
-                <p>
-                    khikmatillaev's — это мастерская, где рождается совершенство. Мы создаём эксклюзивную одежду 
-                    высочайшего качества, сочетая классические традиции с современным стилем.
-                </p>
-                <p>
-                    Каждое изделие тщательно отбирается и изготавливается с особым вниманием к деталям. 
-                    Мы используем только премиальные материалы, гарантирующие комфорт и долговечность.
-                </p>
-                <p>
-                    Наша миссия — предоставить вам одежду, которая не только выглядит потрясающе, 
-                    но и дарит ощущение уверенности и стиля.
-                </p>
-            </div>
-            <div class="about-image">
-                Коллекция премиум-класса
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="hero-card-title"><i class="fas fa-chart-line"></i> Наши показатели</div>
+                <div class="hero-stats">
+                    <div class="hero-stat"><div class="hero-stat-num">500+</div><div class="hero-stat-label">Товаров</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">20+</div><div class="hero-stat-label">Категорий</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Качество</div></div>
+                    <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Поддержка</div></div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- FAQ -->
-    <section id="faq">
-        <h2 class="section-title">Часто задаваемые вопросы</h2>
-        <div class="faq-container">
-            <div class="faq-item">
-                <h4>Какие материалы вы используете?</h4>
-                <p>
-                    Мы используем только премиальные ткани от лучших мировых производителей. 
-                    Каждый материал проходит строгий контроль качества перед использованием.
-                </p>
+<!-- MARQUEE -->
+<div class="marquee">
+    <div class="marquee-track">
+        <span class="marquee-item"><i class="fas fa-truck-fast"></i> Быстрая доставка</span>
+        <span class="marquee-item"><i class="fas fa-shield-check"></i> Премиум качество</span>
+        <span class="marquee-item"><i class="fas fa-tags"></i> Доступные цены</span>
+        <span class="marquee-item"><i class="fas fa-rotate-left"></i> Возврат 14 дней</span>
+        <span class="marquee-item"><i class="fas fa-star"></i> Новая коллекция</span>
+        <span class="marquee-item"><i class="fas fa-fire"></i> Скидки</span>
+        <span class="marquee-item"><i class="fas fa-truck-fast"></i> Быстрая доставка</span>
+        <span class="marquee-item"><i class="fas fa-shield-check"></i> Премиум качество</span>
+        <span class="marquee-item"><i class="fas fa-tags"></i> Доступные цены</span>
+        <span class="marquee-item"><i class="fas fa-rotate-left"></i> Возврат 14 дней</span>
+        <span class="marquee-item"><i class="fas fa-star"></i> Новая коллекция</span>
+        <span class="marquee-item"><i class="fas fa-fire"></i> Скидки</span>
+    </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section about-section" id="about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-text reveal">
+                <h3>О бренде khikmatillaev's</h3>
+                <p>Мы создаём эксклюзивную одежду высочайшего качества, сочетая классические традиции с современным стилем. Каждое изделие тщательно отбирается и изготавливается с особым вниманием к деталям.</p>
+                <p>Мы используем только премиальные материалы, гарантирующие комфорт и долговечность. Наша миссия — предоставить вам одежду, которая не только выглядит потрясающе, но и дарит ощущение уверенности и стиля.</p>
+                <div class="about-features">
+                    <div class="about-feat">
+                        <div class="about-feat-icon"><i class="fas fa-gem"></i></div>
+                        <div class="about-feat-text">
+                            <h4>Премиум материалы</h4>
+                            <p>Только лучшие ткани от проверенных поставщиков</p>
+                        </div>
+                    </div>
+                    <div class="about-feat">
+                        <div class="about-feat-icon"><i class="fas fa-palette"></i></div>
+                        <div class="about-feat-text">
+                            <h4>Уникальный дизайн</h4>
+                            <p>Эксклюзивные модели и авторские принты</p>
+                        </div>
+                    </div>
+                    <div class="about-feat">
+                        <div class="about-feat-icon"><i class="fas fa-hands-holding"></i></div>
+                        <div class="about-feat-text">
+                            <h4>Ручная работа</h4>
+                            <p>Каждое изделие создаётся с особым вниманием</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="faq-item">
-                <h4>Как долго доставка?</h4>
-                <p>
-                    Время доставки зависит от вашего местоположения. Обычно доставка занимает 3-7 рабочих дней. 
-                    Вы получите номер отслеживания при отправке заказа.
-                </p>
-            </div>
-            <div class="faq-item">
-                <h4>Можно ли вернуть товар?</h4>
-                <p>
-                    Да, мы предоставляем возможность вернуть товар в течение 30 дней после покупки. 
-                    Товар должен быть в оригинальном состоянии и неношеном виде.
-                </p>
-            </div>
-            <div class="faq-item">
-                <h4>Как выбрать правильный размер?</h4>
-                <p>
-                    На странице каждого товара представлена таблица размеров. Мы рекомендуем ознакомиться с ней перед покупкой. 
-                    Если у вас есть вопросы, свяжитесь с нашей поддержкой.
-                </p>
+            <div class="about-visual reveal">
+                <i class="fas fa-tshirt"></i>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- КОНТАКТЫ -->
-    <section id="contacts">
-        <h2 class="section-title">Контакты</h2>
-        <div class="contacts-grid">
-            <div class="contact-item">
-                <h3>Телефон</h3>
-                <p><a href="tel:+998901234567">+998 90 123 45 67</a></p>
+<!-- WHY US -->
+<section class="section why-section" id="why">
+    <div class="container">
+        <div class="sec-head reveal">
+            <div class="sec-label">Преимущества</div>
+            <h2 class="sec-title">Почему khikmatillaev's?</h2>
+            <p class="sec-desc">Мы предлагаем не просто одежду, а образ жизни</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card reveal">
+                <div class="why-icon"><i class="fas fa-truck-fast"></i></div>
+                <h3 class="why-title">Быстрая доставка</h3>
+                <p class="why-desc">Доставка по всей стране в течение 1-3 дней</p>
             </div>
-            <div class="contact-item">
-                <h3>Email</h3>
-                <p><a href="mailto:info@khikmatillaev.com">info@khikmatillaev.com</a></p>
+            <div class="why-card reveal">
+                <div class="why-icon"><i class="fas fa-shield-check"></i></div>
+                <h3 class="why-title">Гарантия качества</h3>
+                <p class="why-desc">Только премиум материалы и профессиональный пошив</p>
             </div>
-            <div class="contact-item">
-                <h3>Instagram</h3>
-                <p><a href="https://instagram.com/khikmatillaev" target="_blank">@khikmatillaev</a></p>
+            <div class="why-card reveal">
+                <div class="why-icon"><i class="fas fa-tags"></i></div>
+                <h3 class="why-title">Лучшие цены</h3>
+                <p class="why-desc">Доступные цены и постоянные скидки для клиентов</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon"><i class="fas fa-headset"></i></div>
+                <h3 class="why-title">Поддержка 24/7</h3>
+                <p class="why-desc">Вы можете связаться с нами в любое время через Telegram</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2024 khikmatillaev's. Все права защищены.</p>
-    </footer>
+<!-- CTA -->
+<section class="cta">
+    <div class="cta-inner">
+        <h2 class="cta-title">Найдите свой стиль сегодня</h2>
+        <p class="cta-desc">Специальные скидки на новую коллекцию — не упустите возможность!</p>
+        <a href="/catalog/" class="btn btn-cta"><i class="fas fa-shopping-bag"></i> Купить сейчас</a>
+    </div>
+</section>
 
-    <script>
-        // FAQ интерактивность
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.addEventListener('click', () => {
-                item.classList.toggle('active');
-            });
-        });
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-grid">
+        <div>
+            <div class="footer-logo">khikmatillaev's</div>
+            <p class="footer-about">khikmatillaev's — магазин премиальной одежды. Современный стиль, высокое качество и доступные цены в одном месте.</p>
+            <div class="footer-social">
+                {% if admin_tg %}<a href="https://t.me/{{ admin_tg }}" target="_blank"><i class="fab fa-telegram"></i></a>{% endif %}
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div>
+            <div class="footer-col-title">Страницы</div>
+            <ul class="footer-links">
+                <li><a href="#home">Главная</a></li>
+                <li><a href="/catalog/">Каталог</a></li>
+                <li><a href="#about">О нас</a></li>
+                <li><a href="#why">Преимущества</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-col-title">Контакты</div>
+            <ul class="footer-links">
+                {% if admin_tg %}<li><a href="https://t.me/{{ admin_tg }}" target="_blank"><i class="fab fa-telegram"></i> Telegram</a></li>{% endif %}
+                <li><a href="#"><i class="fas fa-envelope"></i> info@khikmatillaev.com</a></li>
+                <li><a href="#"><i class="fas fa-phone"></i> +998 90 123 45 67</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 khikmatillaev's. Все права защищены.</span>
+    </div>
+</footer>
 
-        // Scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+<script>
+// NAV scroll
+window.addEventListener('scroll',()=>{
+    document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+// Reveal on scroll
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Load categories
+async function loadCategories(){
+    try{
+        const r=await fetch('/api/categories/');
+        const d=await r.json();
+        const cats=d.categories||[];
+        document.getElementById('statCats').textContent=cats.length;
+        const grid=document.getElementById('catGrid');
+        grid.innerHTML=cats.map(c=>`
+            <a href="/catalog/?category=${encodeURIComponent(c)}" class="cat-card reveal">
+                <div class="cat-card-top">👕</div>
+                <div class="cat-card-body">
+                    <h3 class="cat-card-name">${c}</h3>
+                    <p class="cat-card-desc">Посмотреть все товары</p>
+                    <span class="cat-card-count"><i class="fas fa-box"></i> Категория</span>
+                </div>
+                <div class="cat-card-arrow"><i class="fas fa-arrow-right"></i></div>
+            </a>
+        `).join('');
+        document.querySelectorAll('.cat-card.reveal').forEach(el=>obs.observe(el));
+    }catch(e){console.error(e)}
+}
+
+// Load featured products with slider
+async function loadFeatured(){
+    try{
+        const r=await fetch('/api/products/?badge=hot');
+        let prods=await r.json();
+        if(!prods.length){const r2=await fetch('/api/products/?badge=new');prods=await r2.json();}
+        if(!prods.length){const r3=await fetch('/api/products/');prods=(await r3.json()).slice(0,8);}
+        document.getElementById('statProducts').textContent=prods.length;
+        document.getElementById('statNew').textContent=prods.filter(p=>p.badge==='new').length;
+        const grid=document.getElementById('featGrid');
+        const badgeMap={'new':'Новинка','hot':'Хит','sale':'Скидка'};
+        grid.innerHTML=prods.slice(0,8).map((p,idx)=>{
+            const dp=p.discount_percent>0?Math.round(p.price*(1-p.discount_percent/100)):null;
+            const imgs=p.images&&p.images.length?p.images:[];
+            const hasImages=imgs.length>0&&imgs[0]!=='👕';
+            const hasMultiple=imgs.length>1;
+
+            let imgHTML='';
+            if(!hasImages){
+                imgHTML='<div class="prod-img-emoji">👕</div>';
+            }else{
+                imgHTML=imgs.map((src,i)=>`<img src="${src}" alt="${p.name}" class="${i===0?'active':''}" data-index="${i}">`).join('');
+                if(hasMultiple){
+                    imgHTML+=`<div class="prod-img-hover-zones">
+                        <div class="hover-zone hover-zone-left" data-direction="prev"></div>
+                        <div class="hover-zone hover-zone-right" data-direction="next"></div>
+                    </div>`;
+                    imgHTML+=`<div class="prod-img-nav">${imgs.map((s,i)=>`<div class="prod-img-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('')}</div>`;
                 }
-            });
-        }, observerOptions);
+            }
 
-        // Observe elements for scroll animations
-        document.querySelectorAll('.section-title, .section-subtitle, .about-text p, .contact-item h3').forEach(el => {
-            el.classList.add('animate-on-scroll');
-            observer.observe(el);
+            return`<a href="/catalog/" class="prod-card reveal" data-card-id="${idx}">
+                <div class="prod-img" data-images='${JSON.stringify(imgs)}' data-has-slider="${hasMultiple}">${imgHTML}
+                    ${p.badge?`<span class="prod-badge badge-${p.badge}">${badgeMap[p.badge]||''}</span>`:''}
+                </div>
+                <div class="prod-body">
+                    <div class="prod-cat">${p.category||''}</div>
+                    <h3 class="prod-name">${p.name}</h3>
+                    <div class="prod-price">
+                        <span class="price-now">${fmt(dp||p.price)}</span>
+                        ${dp?`<span class="price-old">${fmt(p.price)}</span>`:''}
+                    </div>
+                    ${p.sizes&&p.sizes.length?`<div class="prod-sizes">${p.sizes.slice(0,4).map(s=>`<span class="size-tag">${s}</span>`).join('')}</div>`:''}
+                </div>
+            </a>`;
+        }).join('');
+        document.querySelectorAll('.prod-card.reveal').forEach(el=>obs.observe(el));
+        initImageSliders();
+    }catch(e){console.error(e)}
+}
+
+// Initialize image sliders for product cards
+function initImageSliders(){
+    document.querySelectorAll('.prod-img[data-has-slider="true"]').forEach(container=>{
+        const imgs=container.querySelectorAll('img');
+        const dots=container.querySelectorAll('.prod-img-dot');
+        const leftZone=container.querySelector('.hover-zone-left');
+        const rightZone=container.querySelector('.hover-zone-right');
+        if(imgs.length<=1||!leftZone||!rightZone)return;
+
+        let currentIdx=0;
+        let touchStart=0;
+        let hoverTimeout=null;
+
+        function showImage(idx){
+            if(idx<0)idx=imgs.length-1;
+            if(idx>=imgs.length)idx=0;
+            currentIdx=idx;
+            imgs.forEach((img,i)=>{
+                img.classList.toggle('active',i===idx);
+            });
+            dots.forEach((dot,i)=>{
+                dot.classList.toggle('active',i===idx);
+            });
+        }
+
+        // Continuous navigation on hover
+        function startHover(direction){
+            if(hoverTimeout)clearTimeout(hoverTimeout);
+            showImage(direction==='prev'?currentIdx-1:currentIdx+1);
+            hoverTimeout=setTimeout(()=>{
+                if(container.querySelector('.hover-zone:hover')){
+                    startHover(direction);
+                }
+            },600);
+        }
+
+        leftZone.addEventListener('mouseenter',()=>{
+            startHover('prev');
         });
-    </script>
+
+        rightZone.addEventListener('mouseenter',()=>{
+            startHover('next');
+        });
+
+        leftZone.addEventListener('mouseleave',()=>{
+            if(hoverTimeout){
+                clearTimeout(hoverTimeout);
+                hoverTimeout=null;
+            }
+        });
+
+        rightZone.addEventListener('mouseleave',()=>{
+            if(hoverTimeout){
+                clearTimeout(hoverTimeout);
+                hoverTimeout=null;
+            }
+        });
+
+        // Click on dots
+        dots.forEach((dot,i)=>{
+            dot.addEventListener('click',(e)=>{
+                e.preventDefault();
+                e.stopPropagation();
+                if(hoverTimeout)clearTimeout(hoverTimeout);
+                showImage(i);
+            });
+        });
+
+        // Touch swipe
+        container.addEventListener('touchstart',(e)=>{
+            touchStart=e.changedTouches[0].screenX;
+        },{passive:true});
+
+        container.addEventListener('touchend',(e)=>{
+            const touchEnd=e.changedTouches[0].screenX;
+            const diff=touchStart-touchEnd;
+            if(Math.abs(diff)>50){
+                showImage(diff>0?currentIdx+1:currentIdx-1);
+            }
+        },{passive:true});
+
+        // Reset to first image when mouse leaves card
+        container.closest('.prod-card').addEventListener('mouseleave',()=>{
+            if(hoverTimeout)clearTimeout(hoverTimeout);
+            setTimeout(()=>showImage(0),200);
+        });
+    });
+}
+
+function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')+" сум"}
+
+loadCategories();
+loadFeatured();
+</script>
 </body>
 </html>
