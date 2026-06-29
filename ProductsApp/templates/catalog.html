@@ -11,7 +11,7 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         :root{
-            --burgundy:#8B1538;--deep-burgundy:#5A0F24;--wine:#6B1129;--maroon:#9B1B3A;
+            --burgundy:#AE1F23;--deep-burgundy:#4E0000;--wine:#4E0000;--maroon:#AE1F23;
             --cream:#FFF8F0;--milk:#FFFBF7;--beige:#F5E6D3;--rose:#FFE4E9;--rose2:#FFD1DC;
             --white:#ffffff;--g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
             --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;--g900:#0f172a;
@@ -216,33 +216,8 @@
         </div>
 
         <div class="sb-group">
-            <h4>Категории</h4>
-            <div class="cat-list" id="catList"></div>
-        </div>
-
-        <div class="sb-group">
             <h4>Размер</h4>
             <div class="sb-badge" id="sizeList"></div>
-        </div>
-
-        <div class="sb-group">
-            <h4>Цена</h4>
-            <div class="sb-badge">
-                <div class="badge-btn" data-price="" onclick="selectPrice(this,'')">Все</div>
-                <div class="badge-btn" data-price="0-100000" onclick="selectPrice(this,'0-100000')">До 100k</div>
-                <div class="badge-btn" data-price="100000-500000" onclick="selectPrice(this,'100000-500000')">100k - 500k</div>
-                <div class="badge-btn" data-price="500000-1000000" onclick="selectPrice(this,'500000-1000000')">500k - 1M</div>
-                <div class="badge-btn" data-price="1000000-999999999" onclick="selectPrice(this,'1000000-999999999')">Более 1M</div>
-            </div>
-        </div>
-
-        <div class="sb-group">
-            <h4>Статус</h4>
-            <div class="sb-badge" id="badgeList">
-                <div class="badge-btn active" data-badge="" onclick="selectBadge(this,'')">Все</div>
-                <div class="badge-btn" data-badge="new" onclick="selectBadge(this,'new')"><i class="fas fa-sparkles" style="color:var(--burgundy)"></i> Новинки</div>
-                <div class="badge-btn" data-badge="hot" onclick="selectBadge(this,'hot')"><i class="fas fa-fire" style="color:var(--red)"></i> Хиты</div>
-            </div>
         </div>
 
         <button class="btn-reset" onclick="resetFilters()"><i class="fas fa-undo"></i> Сбросить</button>
@@ -294,26 +269,16 @@
 </footer>
 
 <script>
-let allProducts=[], allCategories=[], allSizes=[];
-let currentCat=null, currentSize='', currentPrice='', currentBadge='', currentProduct=null, selectedSize='';
+let allProducts=[], allSizes=[];
+let currentSize='', currentProduct=null, selectedSize='';
 
 document.addEventListener('DOMContentLoaded',()=>{
-    loadCategories();
     loadSizes();
     loadProducts();
     document.getElementById('searchInput').addEventListener('input',debounce(filterProducts,300));
 });
 
 function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-
-async function loadCategories(){
-    try{
-        const r=await fetch('/api/categories/');
-        const d=await r.json();
-        allCategories=d.categories||[];
-        renderCats();
-    }catch(e){console.error(e)}
-}
 
 async function loadSizes(){
     try{
@@ -324,48 +289,16 @@ async function loadSizes(){
     }catch(e){console.error(e)}
 }
 
-function renderCats(){
-    const el=document.getElementById('catList');
-    el.innerHTML=`<div class="cat-item ${!currentCat?'active':''}" onclick="pickCat(null)"><span class="ci-icon">📦</span><span>Все категории</span></div>`+
-        allCategories.map(c=>`
-        <div class="cat-item ${currentCat===c?'active':''}" onclick="pickCat('${c}')">
-            <span class="ci-icon">👕</span>
-            <span>${c}</span>
-        </div>
-    `).join('');
-}
-
 function renderSizes(){
     const el=document.getElementById('sizeList');
-    el.innerHTML=`<div class="badge-btn active" data-size="" onclick="selectSize(this,'')">Все</div>`+
+    el.innerHTML=`<div class="badge-btn active" data-size="" onclick="selectSize(this,'')">Все размеры</div>`+
         allSizes.map(s=>`<div class="badge-btn" data-size="${s}" onclick="selectSize(this,'${s}')">${s}</div>`).join('');
-}
-
-function pickCat(cat){
-    currentCat=cat;
-    renderCats();
-    filterProducts();
-    closeSidebar();
 }
 
 function selectSize(el,s){
     document.querySelectorAll('#sizeList .badge-btn').forEach(x=>x.classList.remove('active'));
     el.classList.add('active');
     currentSize=s;
-    filterProducts();
-}
-
-function selectPrice(el,p){
-    document.querySelectorAll('[data-price]').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-    currentPrice=p;
-    filterProducts();
-}
-
-function selectBadge(el,b){
-    document.querySelectorAll('.badge-btn[data-badge]').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-    currentBadge=b;
     filterProducts();
 }
 
@@ -379,13 +312,7 @@ async function loadProducts(){
 
 function filterProducts(){
     let f=[...allProducts];
-    if(currentCat)f=f.filter(p=>p.category===currentCat);
     if(currentSize)f=f.filter(p=>p.sizes&&p.sizes.includes(currentSize));
-    if(currentPrice){
-        const[min,max]=currentPrice.split('-').map(Number);
-        f=f.filter(p=>p.price>=min&&p.price<=max);
-    }
-    if(currentBadge)f=f.filter(p=>p.badge===currentBadge);
     const q=document.getElementById('searchInput').value.toLowerCase().trim();
     if(q)f=f.filter(p=>p.name.toLowerCase().includes(q)||p.description.toLowerCase().includes(q));
     const s=document.getElementById('sortSelect').value;
@@ -574,19 +501,11 @@ document.getElementById('orderForm').addEventListener('submit',async function(e)
 });
 
 function resetFilters(){
-    currentCat=null;currentSize='';currentPrice='';currentBadge='';
+    currentSize='';
     document.getElementById('searchInput').value='';
-    document.querySelectorAll('.badge-btn').forEach(x=>x.classList.remove('active'));
-    document.querySelector('.badge-btn[data-badge=""]').classList.add('active');
-    document.querySelector('.badge-btn[data-size=""]').classList.add('active');
-    document.querySelector('.badge-btn[data-price=""]').classList.add('active');
-    renderCats();filterProducts();
-}
-
-function csrf(){
-    let v=null;
-    if(document.cookie){document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith('csrftoken='))v=decodeURIComponent(c.slice(10))})}
-    return v;
+    document.querySelectorAll('#sizeList .badge-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelector('#sizeList .badge-btn[data-size=""]').classList.add('active');
+    filterProducts();
 }
 
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('open')}
