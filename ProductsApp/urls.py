@@ -28,8 +28,8 @@ urlpatterns = [
     # ── Публичный API ──────────────────────────────────
     path('api/products/',              ProductListAPIView.as_view(),   name='api_products'),
     path('api/products/<int:pk>/',     ProductDetailAPIView.as_view(), name='api_product_detail'),
-    path('api/products/categories/',   CategoryListAPIView.as_view(),  name='api_categories'),
-    path('api/products/sizes/',        SizeListAPIView.as_view(),      name='api_sizes'),
+    path('api/categories/',            CategoryListAPIView.as_view(),  name='api_categories'),
+    path('api/sizes/',                 SizeListAPIView.as_view(),      name='api_sizes'),
     path('api/send_order/',            SendOrderAPIView.as_view(),     name='api_send_order'),
 
     # ── Авторизация ────────────────────────────────────
